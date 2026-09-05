@@ -1,0 +1,93 @@
+---
+const days = [
+  {
+    label: 'СБ, 5 СЕНТЯБРЯ',
+    slots: [
+      { time: '10:00' },
+      { time: '11:00', taken: true },
+      { time: '12:30' },
+      { time: '14:00' },
+      { time: '15:30', taken: true },
+      { time: '17:00' },
+    ],
+  },
+  {
+    label: 'ВС, 6 СЕНТЯБРЯ',
+    slots: [
+      { time: '09:30' },
+      { time: '11:00' },
+      { time: '13:00', taken: true },
+      { time: '16:00' },
+    ],
+  },
+];
+---
+
+<section id="booking" class="scroll-mt-6 py-14 border-b border-hairline">
+  <div class="text-xs text-slate-text font-mono mb-2">05 / ЗАПИСЬ НА ПРИЁМ</div>
+  <h2 class="font-slab text-[22px] mb-6">Выберите время</h2>
+  <div class="flex gap-8 flex-wrap">
+    <div class="flex-1 min-w-[320px]" id="booking-cal">
+      {days.map((day) => (
+        <>
+          <div class="text-[13px] text-slate-text mb-2 font-mono">{day.label}</div>
+          <div class="flex flex-wrap gap-2 mb-[18px]">
+            {day.slots.map((slot) =>
+              slot.taken ? (
+                <span class="font-mono text-[13px] py-1.5 px-3 border border-hairline text-[#b9bdb4] rounded bg-[#f4f5f2] line-through cursor-not-allowed">
+                  {slot.time}
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  class="slot-btn font-mono text-[13px] py-1.5 px-3 border border-teal text-teal rounded bg-white cursor-pointer aria-pressed:bg-teal aria-pressed:text-white"
+                  data-time={slot.time}
+                  aria-pressed="false"
+                >
+                  {slot.time}
+                </button>
+              )
+            )}
+          </div>
+        </>
+      ))}
+    </div>
+    <form id="booking-form" class="flex-1 min-w-[280px] bg-white border border-hairline rounded p-5">
+      <label class="block text-[13px] text-slate-text mt-3 mb-1">Имя</label>
+      <input type="text" placeholder="Как к вам обращаться" class="w-full py-2 px-2.5 border border-hairline rounded font-sans text-sm bg-white text-ink" />
+      <label class="block text-[13px] text-slate-text mt-3 mb-1">Телефон</label>
+      <input type="tel" placeholder="+7 ___ ___-__-__" class="w-full py-2 px-2.5 border border-hairline rounded font-sans text-sm bg-white text-ink" />
+      <div class="flex gap-2 items-start my-4 text-xs text-slate-text">
+        <input type="checkbox" id="consent" required class="mt-0.5" />
+        <label for="consent" class="m-0">
+          Согласен(-на) на обработку персональных данных в соответствии с <a href="#" class="underline">политикой конфиденциальности</a>
+        </label>
+      </div>
+      <button type="submit" class="w-full bg-teal text-white font-sans font-bold text-[15px] py-[13px] px-6 rounded border-none cursor-pointer">
+        Записаться
+      </button>
+      <p class="text-[11px] text-slate-text mt-2.5" id="booking-status">Форма — визуальная демонстрация, данные никуда не отправляются.</p>
+    </form>
+  </div>
+</section>
+
+<script>
+  const cal = document.getElementById('booking-cal');
+  cal?.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const btn = target.closest('.slot-btn') as HTMLButtonElement | null;
+    if (!btn) return;
+    const wasPressed = btn.getAttribute('aria-pressed') === 'true';
+    cal.querySelectorAll('.slot-btn').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+    btn.setAttribute('aria-pressed', wasPressed ? 'false' : 'true');
+  });
+
+  const form = document.getElementById('booking-form') as HTMLFormElement | null;
+  const status = document.getElementById('booking-status');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (status) {
+      status.textContent = 'Заявка принята (демо) — на реальном сайте здесь будет подтверждение записи.';
+    }
+  });
+</script>

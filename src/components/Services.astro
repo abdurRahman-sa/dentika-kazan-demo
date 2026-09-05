@@ -1,0 +1,40 @@
+---
+const services = [
+  'Взрослый стоматолог-хирург',
+  'Взрослый ортодонт',
+  'Взрослый стоматолог-ортопед',
+  'Имплантация',
+  'Взрослый пародонтолог',
+  'Детский стоматолог-терапевт',
+  'Детский ортодонт',
+  'Детский стоматолог-хирург',
+  'Прицельный снимок зуба',
+  'Неотложка для взрослых',
+];
+---
+
+<section id="services" class="scroll-mt-6 py-14 border-b border-hairline">
+  <div class="text-xs text-slate-text font-mono mb-2">02 / НАПРАВЛЕНИЯ ПРИЁМА</div>
+  <h2 class="font-slab text-[22px] mb-6">Услуги</h2>
+  <div>
+    {services.map((name) => (
+      <div class="flex justify-between py-3.5 px-0.5 border-b border-dashed border-hairline last:border-b-0">
+        <span class="text-[15px]">{name}</span>
+        <span class="text-teal font-mono whitespace-nowrap pl-4">по записи</span>
+      </div>
+    ))}
+  </div>
+  <p class="text-xs text-slate-text mt-4">
+    Список направлений — по данным открытой карточки клиники на 2ГИС. Цены не публиковались в открытых источниках, поэтому не указаны — определяются на консультации.
+  </p>
+  <div class="grid grid-cols-2 gap-4 mt-6 max-[640px]:grid-cols-1">
+    <div class="bg-white border border-hairline rounded overflow-hidden">
+      <img src="/photos/kabinet-4.png" alt="Лечебный кабинет Dentika, кресло и оборудование" class="block w-full h-[260px] object-cover" />
+      <div class="p-2.5 px-3 text-[13px] text-slate-text">Один из лечебных кабинетов</div>
+    </div>
+    <div class="bg-white border border-hairline rounded overflow-hidden">
+      <img src="/photos/kabinet-4-hall.png" alt="Коридор клиники Dentika у кабинета 4" class="block w-full h-[260px] object-cover" />
+      <div class="p-2.5 px-3 text-[13px] text-slate-text">Зона ожидания у кабинета</div>
+    </div>
+  </div>
+</section>

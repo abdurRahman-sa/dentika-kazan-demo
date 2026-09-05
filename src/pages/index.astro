@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RailNav from '../components/RailNav.astro';
+import Hero from '../components/Hero.astro';
+import Services from '../components/Services.astro';
+import Doctors from '../components/Doctors.astro';
+import BeforeAfter from '../components/BeforeAfter.astro';
+import Booking from '../components/Booking.astro';
+import Contacts from '../components/Contacts.astro';
+import LegalBar from '../components/LegalBar.astro';
+---
+
+<Layout>
+  <div class="flex max-w-[1180px] mx-auto max-[900px]:flex-col">
+    <RailNav />
+    <main class="flex-1 min-w-0 py-8 px-7 pb-16">
+      <Hero />
+      <Services />
+      <Doctors />
+      <BeforeAfter />
+      <Booking />
+      <Contacts />
+    </main>
+  </div>
+  <LegalBar />
+</Layout>

@@ -1,0 +1,31 @@
+---
+const doctors = [
+  { name: 'Иванова Анна Сергеевна', role: 'Стоматолог-терапевт', exp: 'Стаж 12 лет' },
+  { name: 'Галиев Тимур Ринатович', role: 'Стоматолог-хирург, имплантолог', exp: 'Стаж 9 лет' },
+];
+---
+
+<section id="doctors" class="scroll-mt-6 py-14 border-b border-hairline">
+  <div class="text-xs text-slate-text font-mono mb-2">03 / СПЕЦИАЛИСТЫ</div>
+  <h2 class="font-slab text-[22px] mb-6">Врачи</h2>
+  <div class="grid grid-cols-2 gap-5 max-[900px]:grid-cols-1">
+    {doctors.map((doc) => (
+      <div class="bg-white border border-hairline rounded p-5 relative">
+        <div class="w-11 h-11 rounded bg-bg border border-hairline flex items-center justify-center text-slate-text text-lg mb-3.5">👤</div>
+        <p class="font-bold text-[15px] mb-0.5">
+          {doc.name} <span class="font-normal text-slate-text text-xs">(демо-имя)</span>
+        </p>
+        <p class="text-slate-text text-[13px] mb-1">{doc.role}</p>
+        <p class="text-[13px] text-ink mb-3.5">{doc.exp}</p>
+        <a
+          href="#diploma-demo"
+          title="Демо-ссылка: в реальной сборке — скан диплома конкретного врача"
+          class="inline-flex items-center gap-2 -rotate-2 bg-gold-bg border border-gold rounded text-[11px] py-1.5 pl-1.5 pr-2.5 text-ink no-underline font-mono"
+        >
+          <span class="relative shrink-0 w-[22px] h-7 bg-white border border-gold rounded-sm before:content-[''] before:absolute before:left-1 before:right-1 before:top-[7px] before:h-0.5 before:bg-gold before:opacity-50 after:content-[''] after:absolute after:left-1 after:right-1 after:top-[13px] after:h-0.5 after:bg-gold after:opacity-50" />
+          скан диплома ✓
+        </a>
+      </div>
+    ))}
+  </div>
+</section>

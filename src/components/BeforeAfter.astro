@@ -1,0 +1,24 @@
+---
+const cases = ['Лечение кариеса', 'Отбеливание, 1 визит', 'Протезирование'];
+---
+
+<section id="before-after" class="scroll-mt-6 py-14 border-b border-hairline">
+  <div class="text-xs text-slate-text font-mono mb-2">04 / РЕЗУЛЬТАТЫ ЛЕЧЕНИЯ</div>
+  <h2 class="font-slab text-[22px] mb-6">До / После</h2>
+  <div class="grid grid-cols-3 gap-4 max-[900px]:grid-cols-1">
+    {cases.map((label) => (
+      <div class="bg-white border border-hairline rounded overflow-hidden">
+        <div class="aspect-[4/3] bg-[repeating-linear-gradient(135deg,#e3e5df,#e3e5df_10px,#dadcd5_10px,#dadcd5_20px)] flex items-center justify-center text-slate-text text-xs text-center p-3">
+          ФОТО ДО/ПОСЛЕ<br />(демо-изображение)
+        </div>
+        <div class="p-2.5 px-3 text-[13px]">
+          {label}
+          <span class="block text-[11px] text-slate-text font-mono mt-0.5">результат зависит от исходного состояния</span>
+        </div>
+      </div>
+    ))}
+  </div>
+  <p class="text-xs text-slate-text mt-4">
+    Плейсхолдеры — на реальном сайте клиники заменяются на настоящие фото конкретных случаев с согласия пациентов.
+  </p>
+</section>
