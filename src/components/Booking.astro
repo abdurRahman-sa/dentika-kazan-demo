@@ -34,13 +34,13 @@ const days = [
           <div class="flex flex-wrap gap-2 mb-[18px]">
             {day.slots.map((slot) =>
               slot.taken ? (
-                <span class="font-mono text-[13px] py-1.5 px-3 border border-hairline text-[#b9bdb4] rounded bg-[#f4f5f2] line-through cursor-not-allowed">
+                <span class="font-mono text-[13px] py-1.5 px-3 border border-hairline text-[#b9bdb4] rounded-[2px] bg-[#f4f5f2] line-through cursor-not-allowed">
                   {slot.time}
                 </span>
               ) : (
                 <button
                   type="button"
-                  class="slot-btn font-mono text-[13px] py-1.5 px-3 border border-teal text-teal rounded bg-white cursor-pointer aria-pressed:bg-teal aria-pressed:text-white"
+                  class="slot-btn font-mono text-[13px] py-1.5 px-3 border border-teal text-teal rounded-[2px] bg-white cursor-pointer aria-pressed:bg-teal aria-pressed:text-white"
                   data-time={slot.time}
                   aria-pressed="false"
                 >
@@ -52,18 +52,18 @@ const days = [
         </>
       ))}
     </div>
-    <form id="booking-form" class="flex-1 min-w-[280px] bg-white border border-hairline rounded p-5">
+    <form id="booking-form" class="flex-1 min-w-[280px] bg-white border border-hairline rounded-[2px] p-5">
       <label class="block text-[13px] text-slate-text mt-3 mb-1">Имя</label>
-      <input type="text" placeholder="Как к вам обращаться" class="w-full py-2 px-2.5 border border-hairline rounded font-sans text-sm bg-white text-ink" />
+      <input type="text" placeholder="Как к вам обращаться" class="w-full py-2 px-2.5 border border-hairline rounded-[2px] font-sans text-sm bg-white text-ink" />
       <label class="block text-[13px] text-slate-text mt-3 mb-1">Телефон</label>
-      <input type="tel" placeholder="+7 ___ ___-__-__" class="w-full py-2 px-2.5 border border-hairline rounded font-sans text-sm bg-white text-ink" />
+      <input type="tel" placeholder="+7 ___ ___-__-__" class="w-full py-2 px-2.5 border border-hairline rounded-[2px] font-sans text-sm bg-white text-ink" />
       <div class="flex gap-2 items-start my-4 text-xs text-slate-text">
         <input type="checkbox" id="consent" required class="mt-0.5" />
         <label for="consent" class="m-0">
           Согласен(-на) на обработку персональных данных в соответствии с <a href="#" class="underline">политикой конфиденциальности</a>
         </label>
       </div>
-      <button type="submit" class="w-full bg-teal text-white font-sans font-bold text-[15px] py-[13px] px-6 rounded border-none cursor-pointer">
+      <button type="submit" class="w-full bg-teal text-white font-sans font-bold text-[15px] py-[13px] px-6 rounded-[2px] border-none cursor-pointer">
         Записаться
       </button>
       <p class="text-[11px] text-slate-text mt-2.5" id="booking-status">Форма — визуальная демонстрация, данные никуда не отправляются.</p>

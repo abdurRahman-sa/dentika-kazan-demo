@@ -14,8 +14,6 @@
   --font-slab: 'Bitter', Georgia, serif;
   --font-mono: 'IBM Plex Mono', monospace;
   --font-sans: 'PT Sans', system-ui, sans-serif;
-
-  --radius-DEFAULT: 2px;
 }
 
 /* ===== Шрифты: самохостинг, без внешних запросов к Google Fonts =====
