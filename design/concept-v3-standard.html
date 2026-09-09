@@ -92,7 +92,7 @@ html{scrollbar-color:var(--line) transparent; scrollbar-width:thin}
 .h1{font-size:clamp(32px,4.4vw,52px); line-height:1.08; font-weight:700; letter-spacing:-0.025em; text-wrap:balance}
 .h2{font-size:clamp(24px,2.8vw,34px); line-height:1.15; font-weight:700; letter-spacing:-0.02em; text-wrap:balance}
 .h3{font-size:19px; line-height:1.3; font-weight:600; letter-spacing:-0.01em}
-.lead{font-size:clamp(16px,1.3vw,18px); line-height:1.6; color:var(--muted); max-width:52ch}
+.lead{font-size:clamp(16px,1.3vw,18px); line-height:1.6; color:var(--muted); max-width:52ch; transition:color .35s ease}
 .small{font-size:14px; line-height:1.5}
 .tiny{font-size:13px; line-height:1.45; color:var(--muted)}
 .num{font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1}
@@ -180,12 +180,12 @@ section{padding:72px 0}
 .hero h1{margin-bottom:18px}
 .hero .lead{margin-bottom:28px}
 .hero-cta{display:flex; flex-wrap:wrap; gap:12px; margin-bottom:34px}
-.facts{display:flex; flex-wrap:wrap; gap:10px 28px; padding-top:26px; border-top:1px solid var(--line)}
+.facts{display:flex; flex-wrap:wrap; gap:10px 28px; padding-top:26px; border-top:1px solid var(--line); transition:border-color .35s ease}
 .fact{display:flex; align-items:center; gap:10px; font-size:14.5px}
-.fact svg{color:var(--brand); flex:none}
+.fact svg{color:var(--brand); flex:none; transition:color .35s ease}
 .fact b{font-weight:700; font-size:17px}
-.fact span{color:var(--muted)}
-.fact a{color:var(--ink); font-weight:600}
+.fact span{color:var(--muted); transition:color .35s ease}
+.fact a{color:var(--ink); font-weight:600; transition:color .35s ease}
 .fact--accent svg{color:var(--accent)}
 
 .hero-media{position:relative}
@@ -201,12 +201,26 @@ section{padding:72px 0}
   border-radius:14px; padding:12px 16px 12px 13px;
   box-shadow:0 4px 12px rgb(var(--shadow) / .18);
   animation:rise .8s cubic-bezier(.16,1,.3,1) both .25s;
+  transition:background-color .35s ease, border-color .35s ease;
 }
 .live-dot{position:relative; width:11px; height:11px; flex:none; margin-top:5px}
-.live-dot i{position:absolute; inset:0; border-radius:99px; background:var(--accent)}
+.live-dot i{position:absolute; inset:0; border-radius:99px; background:var(--accent); transition:background-color .35s ease}
 .live-dot i:first-child{animation:ping 2.6s cubic-bezier(.16,1,.3,1) infinite}
 .live b{display:block; font-size:15px; font-weight:700; line-height:1.25; white-space:nowrap}
-.live .live-sub{display:block; font-size:12.5px; color:var(--muted); white-space:nowrap}
+.live .live-sub{display:block; font-size:12.5px; color:var(--muted); white-space:nowrap; transition:color .35s ease}
+
+/* Момент героя: плашка живых слотов не просто появляется, а сперва "проверяет"
+   расписание и лишь затем раскрывает число — драматизирует то самое отличие
+   от конкурентов (реальные слоты, а не форма заявки), которое обещает герой. */
+.live-body{position:relative}
+.live-checking{
+  position:absolute; inset:-2px -6px; display:flex; align-items:center;
+  background:var(--surface); font-size:13px; font-weight:600; color:var(--muted);
+  white-space:nowrap; transition:background-color .35s ease, color .35s ease;
+  animation:checking-out .4s ease forwards; animation-delay:1.05s;
+  pointer-events:none; /* реальный текст под оверлеем остаётся кликабельным/выделяемым всё время */
+}
+@keyframes checking-out{to{opacity:0; visibility:hidden}}
 @keyframes ping{0%{transform:scale(1);opacity:.55}70%,100%{transform:scale(2.6);opacity:0}}
 @keyframes rise{from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:none}}
 
@@ -449,7 +463,11 @@ footer a{color:#fff}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important}
+  /* "Живой" индикатор слотов несёт смысл (данные обновляются), не только украшает —
+     оставляем его как мягкую пульсацию яркости без масштабирования вместо полной тишины. */
+  .live-dot i:first-child{animation:ping-gentle 2.6s ease-in-out infinite !important}
 }
+@keyframes ping-gentle{0%,100%{opacity:.4} 50%{opacity:1}}
 </style>
 </head>
 <body>
@@ -597,9 +615,10 @@ footer a{color:#fff}
       <img src="../photos/kabinet-4.png" alt="Лечебный кабинет клиники Dentika: стоматологическая установка и оборудование" width="900" height="600">
       <div class="live">
         <span class="live-dot"><i></i><i></i></span>
-        <div>
+        <div class="live-body">
           <b>Сегодня свободно <span class="num">4</span> слота</b>
           <span class="live-sub">ближайший в <span class="num">14:30</span> · демо</span>
+          <span class="live-checking" aria-hidden="true">Проверяем расписание…</span>
         </div>
       </div>
     </figure>
