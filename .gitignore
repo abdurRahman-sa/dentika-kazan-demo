@@ -1,0 +1,8 @@
+# Служебное macOS
+.DS_Store
+
+# Скриншоты ревью — 4.4 МБ, пересоздаются из мокапа за минуту
+.impeccable/review/
+
+# Кэш детектора Impeccable, локальный для машины
+.impeccable/hook.cache.json
