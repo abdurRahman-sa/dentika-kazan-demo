@@ -1,40 +1,131 @@
 ---
-const services = [
-  'Взрослый стоматолог-хирург',
-  'Взрослый ортодонт',
-  'Взрослый стоматолог-ортопед',
-  'Имплантация',
-  'Взрослый пародонтолог',
-  'Детский стоматолог-терапевт',
-  'Детский ортодонт',
-  'Детский стоматолог-хирург',
-  'Прицельный снимок зуба',
-  'Неотложка для взрослых',
+import SectionLabel from './SectionLabel.astro';
+import Formula from './Formula.astro';
+import { services, type Aud, type Service } from '../data/clinic';
+
+const audLabel = (aud: Aud[]) => (aud.length === 2 ? 'взрослые и дети' : aud[0] === 'adult' ? 'взрослые' : 'дети');
+const rowAud = (s: Service) =>
+  [...new Set([...s.positions.flatMap((p) => p.aud), ...(s.pending?.aud ?? [])])].join(' ');
+
+const filters = [
+  { value: 'all', label: 'Все' },
+  { value: 'adult', label: 'Взрослым' },
+  { value: 'child', label: 'Детям' },
 ];
 ---
 
-<section id="services" class="scroll-mt-6 py-14 border-b border-hairline">
-  <div class="text-xs text-slate-text font-mono mb-2">02 / НАПРАВЛЕНИЯ ПРИЁМА</div>
-  <h2 class="font-slab text-[22px] mb-6">Услуги</h2>
-  <div>
-    {services.map((name) => (
-      <div class="flex justify-between py-3.5 px-0.5 border-b border-dashed border-hairline last:border-b-0">
-        <span class="text-[15px]">{name}</span>
-        <span class="text-teal font-mono whitespace-nowrap pl-4">по записи</span>
+<section id="services" class="px-gutter py-section" data-services>
+  <div class="grid gap-x-gutter gap-y-12 lg:grid-cols-12 lg:items-end">
+    <div class="lg:col-span-5 xl:col-span-4">
+      <SectionLabel code="11" label="Услуги" />
+      <h2 class="mt-5 text-title font-bold tracking-[-0.025em]">Направления приёма</h2>
+      <p class="mt-4 max-w-[42ch] text-ink-soft">
+        Список — по открытой карточке клиники на 2ГИС. Чего в карточке нет, помечено «уточняется».
+      </p>
+
+      <div class="mt-7 flex flex-wrap items-center gap-x-4 gap-y-3">
+        <div class="inline-flex rounded-ui border border-line bg-surface p-1" role="group" aria-label="Кому показать услуги">
+          {filters.map((f) => (
+            <button
+              type="button"
+              data-aud-btn={f.value}
+              aria-pressed={f.value === 'all' ? 'true' : 'false'}
+              class="h-10 rounded-[7px] px-4 text-[15px] font-medium text-ink-soft transition-colors hover:text-ink aria-pressed:bg-ink aria-pressed:text-paper"
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        <span class="font-mono text-sm text-ink-soft" data-svc-count aria-live="polite">{services.length} направлений</span>
       </div>
+    </div>
+
+    <div class="lg:col-span-7 xl:col-start-6">
+      <Formula />
+    </div>
+  </div>
+
+  <ol class="mt-14 border-t-2 border-ink">
+    {services.map((s, i) => (
+      <li
+        data-row
+        data-aud={rowAud(s)}
+        class="group -mx-gutter grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-3 gap-y-3 border-b border-line px-gutter py-6 transition-colors hover:bg-mint md:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,1.3fr)_auto] md:items-center md:gap-x-6 lg:py-7"
+      >
+        <span data-idx class="pt-2 font-mono text-sm text-ink-soft md:pt-0">{String(i + 1).padStart(2, '0')}</span>
+        <div>
+          <h3 class="text-[22px] font-semibold leading-tight tracking-[-0.015em] sm:text-2xl lg:text-[30px]">{s.title}</h3>
+          <p class="mt-1 text-[15px] text-ink-soft">{s.desc}</p>
+        </div>
+        <ul class="col-start-2 flex flex-wrap gap-2 md:col-start-auto">
+          {s.positions.map((p) => (
+            <li data-chip data-aud={p.aud.join(' ')} class="inline-flex items-center gap-2 rounded-full border border-line bg-surface py-1.5 pr-2 pl-3 text-sm">
+              {p.label}
+              <span class="rounded-full bg-paper px-2 py-0.5 font-mono text-[11px] text-ink-soft">{audLabel(p.aud)}</span>
+            </li>
+          ))}
+          {s.pending && (
+            <li data-chip data-aud={s.pending.aud.join(' ')} class="inline-flex items-center rounded-full border border-dashed border-ink/35 px-3 py-1.5 text-sm text-ink-soft">
+              {s.pending.label}
+            </li>
+          )}
+        </ul>
+        <a
+          href="#booking"
+          data-book={s.id}
+          class="col-start-2 inline-flex items-center gap-1.5 justify-self-start text-[15px] font-semibold underline decoration-amber decoration-2 underline-offset-[6px] md:col-start-auto md:justify-self-end"
+        >
+          Записаться
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </a>
+      </li>
     ))}
-  </div>
-  <p class="text-xs text-slate-text mt-4">
-    Список направлений — по данным открытой карточки клиники на 2ГИС. Цены не публиковались в открытых источниках, поэтому не указаны — определяются на консультации.
-  </p>
-  <div class="grid grid-cols-2 gap-4 mt-6 max-[640px]:grid-cols-1">
-    <div class="bg-white border border-hairline rounded-[2px] overflow-hidden">
-      <img src="/photos/kabinet-4.png" alt="Лечебный кабинет Dentika, кресло и оборудование" class="block w-full h-[260px] object-cover" />
-      <div class="p-2.5 px-3 text-[13px] text-slate-text">Один из лечебных кабинетов</div>
-    </div>
-    <div class="bg-white border border-hairline rounded-[2px] overflow-hidden">
-      <img src="/photos/kabinet-4-hall.png" alt="Коридор клиники Dentika у кабинета 4" class="block w-full h-[260px] object-cover" />
-      <div class="p-2.5 px-3 text-[13px] text-slate-text">Зона ожидания у кабинета</div>
-    </div>
-  </div>
+  </ol>
+
+  <p class="mt-6 text-sm font-medium">Имеются противопоказания. Необходима консультация специалиста.</p>
 </section>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-services]')!;
+  const buttons = root.querySelectorAll<HTMLButtonElement>('[data-aud-btn]');
+  const rows = root.querySelectorAll<HTMLElement>('[data-row]');
+  const chips = root.querySelectorAll<HTMLElement>('[data-chip]');
+  const count = root.querySelector<HTMLElement>('[data-svc-count]')!;
+  const sets = root.querySelectorAll<HTMLElement>('[data-set]');
+
+  const word = (n: number) => {
+    const m10 = n % 10;
+    const m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return 'направление';
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 'направления';
+    return 'направлений';
+  };
+
+  const fits = (el: HTMLElement, aud: string) => aud === 'all' || (el.dataset.aud ?? '').split(' ').includes(aud);
+
+  function apply(aud: string) {
+    document.documentElement.dataset.aud = aud;
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.audBtn === aud)));
+    chips.forEach((chip) => {
+      chip.hidden = !fits(chip, aud);
+    });
+
+    let n = 0;
+    rows.forEach((row) => {
+      const show = fits(row, aud);
+      row.hidden = !show;
+      if (show) {
+        n += 1;
+        row.querySelector('[data-idx]')!.textContent = String(n).padStart(2, '0');
+      }
+    });
+    count.textContent = `${n} ${word(n)}`;
+
+    const setId = aud === 'child' ? 'primary' : 'permanent';
+    sets.forEach((set) => {
+      set.hidden = set.dataset.set !== setId;
+    });
+  }
+
+  buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.audBtn!)));
+</script>

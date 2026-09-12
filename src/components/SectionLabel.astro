@@ -1,0 +1,14 @@
+---
+interface Props {
+  code: string;
+  label: string;
+  tone?: 'dark' | 'light';
+}
+
+const { code, label, tone = 'dark' } = Astro.props;
+---
+
+<div class:list={['flex items-end gap-3', tone === 'light' ? 'text-mint' : 'text-ink']}>
+  <span class="marker" aria-hidden="true">{code}</span>
+  <span class="pb-1 font-mono text-xs uppercase tracking-[0.14em]">{label}</span>
+</div>

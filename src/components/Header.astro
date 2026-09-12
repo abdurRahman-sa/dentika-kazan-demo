@@ -1,0 +1,40 @@
+---
+import { clinic } from '../data/clinic';
+
+const nav = [
+  { href: '#services', label: 'Услуги' },
+  { href: '#visit', label: 'Стоимость' },
+  { href: '#clinic', label: 'Клиника' },
+  { href: '#doctors', label: 'Врачи' },
+  { href: '#contacts', label: 'Контакты' },
+];
+---
+
+<header class="sticky top-0 z-40 border-b border-line bg-paper/95">
+  <div class="flex h-16 items-center gap-4 px-gutter lg:h-[72px]">
+    <a href="#top" class="flex items-baseline gap-2.5" aria-label="Дентика — в начало страницы">
+      <span class="text-[23px] font-bold tracking-[-0.03em]">Дентика</span>
+      <span class="hidden font-mono text-[11px] uppercase tracking-[0.14em] text-ink-soft sm:inline">стоматология</span>
+    </a>
+    <span class="hidden rounded-full border border-dashed border-ink/40 px-2.5 py-1 font-mono text-[11px] text-ink-soft md:inline-flex">
+      Версия 4.Тест
+    </span>
+
+    <nav class="ml-auto hidden lg:block" aria-label="Разделы страницы">
+      <ul class="flex gap-7 text-[15px]">
+        {nav.map((item) => (
+          <li>
+            <a href={item.href} class="py-2 decoration-amber decoration-2 underline-offset-[6px] hover:underline">
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="ml-auto flex items-center gap-4 lg:ml-8">
+      <a href={clinic.phoneHref} class="hidden font-mono text-[15px] hover:underline sm:inline">{clinic.phoneDisplay}</a>
+      <a href="#booking" class="btn btn-amber hidden min-h-11 px-4 md:inline-flex">Записаться</a>
+    </div>
+  </div>
+</header>

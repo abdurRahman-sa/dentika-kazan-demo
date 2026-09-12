@@ -1,43 +1,42 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #171F26;
-  --color-bg: #EDEFEA;
-  --color-teal: #2F6E68;
-  --color-gold: #B98A3B;
-  --color-slate: #6B7A82;
-  --color-slate-text: #57646B;
-  --color-brick: #8C3A3A;
-  --color-hairline: #d8dad3;
-  --color-gold-bg: #fbf3e3;
+  --color-paper: #F4F4EF;
+  --color-surface: #FFFFFF;
+  --color-ink: #121816;
+  --color-ink-soft: #545D5A;
+  --color-line: #D9DBD4;
+  --color-pine: #1C4A41;
+  --color-pine-deep: #12332D;
+  --color-mint: #D3ECDF;
+  --color-mint-strong: #8FCDB1;
+  --color-amber: #F3B443;
+  --color-amber-soft: #F7C766;
 
-  --font-slab: 'Bitter', Georgia, serif;
-  --font-mono: 'IBM Plex Mono', monospace;
-  --font-sans: 'PT Sans', system-ui, sans-serif;
+  --font-sans: 'Onest', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --spacing-gutter: clamp(1rem, 2.4vw, 2.5rem);
+  --spacing-section: clamp(3.5rem, 7vw, 6rem);
+
+  --text-display: clamp(2.6rem, 5.6vw, 5.75rem);
+  --text-display--line-height: 0.98;
+  --text-title: clamp(2rem, 3.6vw, 3.5rem);
+  --text-title--line-height: 1.02;
+
+  --radius-ui: 10px;
 }
 
-/* ===== Шрифты: самохостинг, без внешних запросов к Google Fonts =====
-   Public Sans заменён на PT Sans — у Public Sans нет кириллицы, весь русский
-   текст молча откатывался бы на системный шрифт (см. dentika/design/concept-v2-photos.html). */
+/* Самохостинг шрифтов: без внешних запросов */
 @font-face {
-  font-family: 'Bitter'; font-style: normal; font-weight: 500; font-display: swap;
-  src: url('/fonts/bitter-500-cyrillic.woff2') format('woff2');
+  font-family: 'Onest'; font-style: normal; font-weight: 400 800; font-display: swap;
+  src: url('/fonts/onest-cyrillic.woff2') format('woff2');
   unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 @font-face {
-  font-family: 'Bitter'; font-style: normal; font-weight: 500; font-display: swap;
-  src: url('/fonts/bitter-500-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+2000-206F, U+20AC, U+2122;
-}
-@font-face {
-  font-family: 'Bitter'; font-style: normal; font-weight: 700; font-display: swap;
-  src: url('/fonts/bitter-700-cyrillic.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'Bitter'; font-style: normal; font-weight: 700; font-display: swap;
-  src: url('/fonts/bitter-700-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+2000-206F, U+20AC, U+2122;
+  font-family: 'Onest'; font-style: normal; font-weight: 400 800; font-display: swap;
+  src: url('/fonts/onest-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2212;
 }
 @font-face {
   font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 400; font-display: swap;
@@ -59,33 +58,170 @@
   src: url('/fonts/plexmono-600-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+2000-206F, U+20AC, U+2122;
 }
-@font-face {
-  font-family: 'PT Sans'; font-style: normal; font-weight: 400; font-display: swap;
-  src: url('/fonts/ptsans-400-cyrillic.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'PT Sans'; font-style: normal; font-weight: 400; font-display: swap;
-  src: url('/fonts/ptsans-400-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+2000-206F, U+20AC, U+2122;
-}
-@font-face {
-  font-family: 'PT Sans'; font-style: normal; font-weight: 700; font-display: swap;
-  src: url('/fonts/ptsans-700-cyrillic.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'PT Sans'; font-style: normal; font-weight: 700; font-display: swap;
-  src: url('/fonts/ptsans-700-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+2000-206F, U+20AC, U+2122;
+
+@layer base {
+  html {
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+  ::selection { background: var(--color-amber); color: var(--color-ink); }
+  :focus-visible { outline: 3px solid var(--color-ink); outline-offset: 3px; }
+  .on-dark :focus-visible { outline-color: var(--color-amber); }
+  h1, h2, h3 { text-wrap: balance; }
+  p { text-wrap: pretty; }
 }
 
-body {
-  background: var(--color-bg);
-  color: var(--color-ink);
-  font-family: var(--font-sans);
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    min-height: 3rem;
+    padding-inline: 1.25rem;
+    border-radius: var(--radius-ui);
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: background-color .2s, border-color .2s, color .2s, transform .15s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn svg { transition: transform .25s cubic-bezier(.2, .7, .2, 1); }
+  .btn:hover svg { transform: translateX(3px); }
+  .btn-amber { background: var(--color-amber); color: var(--color-ink); }
+  .btn-amber:hover { background: var(--color-amber-soft); }
+
+  /* Метка раздела в форме коронки зуба; номер — как в зубной формуле */
+  .marker {
+    display: inline-flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: 1.9rem;
+    height: 2.3rem;
+    padding-bottom: 0.35rem;
+    border: 1.5px solid currentColor;
+    border-radius: 6px 6px 14px 14px / 6px 6px 20px 20px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .tooth {
+    display: flex;
+    justify-content: center;
+    flex-basis: 0;
+    min-width: 0;
+    height: var(--h);
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: clamp(8px, 0.95vw, 12px);
+    line-height: 1;
+    color: var(--color-ink-soft);
+    transition: background-color .2s, border-color .2s, color .2s;
+  }
+  .tooth:hover { background: var(--color-mint); border-color: var(--color-mint-strong); color: var(--color-ink); }
+  .tooth-upper {
+    align-items: flex-end;
+    padding-bottom: 0.4rem;
+    border-radius: 5px 5px 14px 14px / 5px 5px 20px 20px;
+    --dy: -10px;
+  }
+  .tooth-lower {
+    align-items: flex-start;
+    padding-top: 0.4rem;
+    border-radius: 14px 14px 5px 5px / 20px 20px 5px 5px;
+    --dy: 10px;
+  }
+  .tooth[data-kind="i"] { --h: clamp(44px, 5.6vw, 84px); }
+  .tooth[data-kind="c"] { --h: clamp(48px, 6.1vw, 92px); }
+  .tooth[data-kind="p"] { --h: clamp(40px, 5.1vw, 76px); }
+  .tooth[data-kind="m"] { --h: clamp(36px, 4.6vw, 68px); }
+
+  .field-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-soft);
+  }
+  .field {
+    width: 100%;
+    height: 3rem;
+    padding-inline: 0.875rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-ui);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-size: 16px;
+    transition: border-color .2s;
+  }
+  .field:hover { border-color: var(--color-ink-soft); }
+  .field:focus { outline: 2px solid var(--color-pine); outline-offset: 1px; border-color: var(--color-pine); }
+  select.field {
+    appearance: none;
+    padding-right: 2.75rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23121816' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 6l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+  }
+
+  .choice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    padding-inline: 0.5rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-ui);
+    background: var(--color-surface);
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color .2s, color .2s, border-color .2s;
+  }
+  .choice:hover { border-color: var(--color-ink); }
+  .choice:has(:checked) { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-paper); }
+  .choice:has(:focus-visible) { outline: 3px solid var(--color-pine); outline-offset: 2px; }
+
+  .photo-cap {
+    position: absolute;
+    left: 0.75rem;
+    bottom: 0.75rem;
+    padding: 0.3rem 0.55rem;
+    border-radius: 6px;
+    background: var(--color-paper);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.2;
+    color: var(--color-ink);
+  }
 }
 
-.font-mono-nums {
-  font-variant-numeric: tabular-nums;
+/* Появление при прокрутке: без JS контент виден сразу */
+.js [data-reveal]:not([data-reveal="teeth"]) {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .7s cubic-bezier(.2, .7, .2, 1), transform .7s cubic-bezier(.2, .7, .2, 1);
+}
+.js [data-reveal].is-in:not([data-reveal="teeth"]) { opacity: 1; transform: none; }
+
+.js [data-reveal="teeth"]:not(.is-in) .tooth { opacity: 0; }
+[data-reveal="teeth"].is-in .tooth {
+  animation: tooth-in .55s cubic-bezier(.2, .7, .2, 1) both;
+  animation-delay: calc(var(--i) * 32ms);
+}
+@keyframes tooth-in {
+  from { opacity: 0; transform: translateY(var(--dy)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] { opacity: 1 !important; transform: none !important; transition: none !important; }
+  [data-reveal="teeth"] .tooth { animation: none !important; opacity: 1 !important; }
 }

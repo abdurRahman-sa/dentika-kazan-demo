@@ -1,31 +1,48 @@
 ---
-const doctors = [
-  { name: 'Иванова Анна Сергеевна', role: 'Стоматолог-терапевт', exp: 'Стаж 12 лет' },
-  { name: 'Галиев Тимур Ринатович', role: 'Стоматолог-хирург, имплантолог', exp: 'Стаж 9 лет' },
-];
+import SectionLabel from './SectionLabel.astro';
+import { specialists } from '../data/clinic';
+
+const fields = ['ФИО', 'Стаж', 'Образование'];
 ---
 
-<section id="doctors" class="scroll-mt-6 py-14 border-b border-hairline">
-  <div class="text-xs text-slate-text font-mono mb-2">03 / СПЕЦИАЛИСТЫ</div>
-  <h2 class="font-slab text-[22px] mb-6">Врачи</h2>
-  <div class="grid grid-cols-2 gap-5 max-[900px]:grid-cols-1">
-    {doctors.map((doc) => (
-      <div class="bg-white border border-hairline rounded-[2px] p-5 relative">
-        <div class="w-11 h-11 rounded-[2px] bg-bg border border-hairline flex items-center justify-center text-slate-text text-lg mb-3.5">👤</div>
-        <p class="font-bold text-[15px] mb-0.5">
-          {doc.name} <span class="font-normal text-slate-text text-xs">(демо-имя)</span>
-        </p>
-        <p class="text-slate-text text-[13px] mb-1">{doc.role}</p>
-        <p class="text-[13px] text-ink mb-3.5">{doc.exp}</p>
-        <a
-          href="#diploma-demo"
-          title="Демо-ссылка: в реальной сборке — скан диплома конкретного врача"
-          class="inline-flex items-center gap-2 -rotate-2 bg-gold-bg border border-gold rounded-[2px] text-[11px] py-1.5 pl-1.5 pr-2.5 text-ink no-underline font-mono"
-        >
-          <span class="relative shrink-0 w-[22px] h-7 bg-white border border-gold rounded-[1px] before:content-[''] before:absolute before:left-1 before:right-1 before:top-[7px] before:h-0.5 before:bg-gold before:opacity-50 after:content-[''] after:absolute after:left-1 after:right-1 after:top-[13px] after:h-0.5 after:bg-gold after:opacity-50" />
-          скан диплома ✓
-        </a>
-      </div>
-    ))}
+<section id="doctors" class="bg-surface px-gutter py-section">
+  <div class="grid gap-x-gutter gap-y-10 lg:grid-cols-12">
+    <div class="lg:col-span-4">
+      <SectionLabel code="14" label="Врачи" />
+      <h2 class="mt-5 text-title font-bold tracking-[-0.025em]">Специалисты</h2>
+      <p class="mt-5 max-w-[40ch] text-[17px] leading-relaxed">
+        В клинике принимают врачи — мужчины и женщины. Для детей в карточке клиники указаны отдельные детские направления.
+      </p>
+      <p class="mt-8 max-w-[42ch] border-l-2 border-amber pl-4 text-sm text-ink-soft">
+        Демо-версия: имена, стаж и образование врачей не опубликованы в открытых источниках — поля оставлены пустыми.
+      </p>
+    </div>
+
+    <ul class="grid border-t border-l border-line sm:grid-cols-2 lg:col-span-8 xl:grid-cols-3" data-reveal>
+      {specialists.map((s) => (
+        <li class="flex min-h-[15rem] flex-col border-r border-b border-line p-6 lg:p-7">
+          <span class="self-start rounded-full bg-mint px-2.5 py-1 font-mono text-[11px]">{s.aud}</span>
+          <h3 class="mt-6 text-2xl font-semibold leading-tight tracking-[-0.015em]">{s.role}</h3>
+          <dl class="mt-auto grid gap-2.5 pt-8 text-sm">
+            {fields.map((f) => (
+              <div class="flex items-baseline gap-3">
+                <dt class="w-[6.5rem] shrink-0 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{f}</dt>
+                <dd class="flex-1 border-b border-dashed border-ink/25 pb-0.5 text-ink-soft">не указано</dd>
+              </div>
+            ))}
+          </dl>
+        </li>
+      ))}
+      <li class="flex min-h-[15rem] flex-col justify-between gap-6 border-r border-b border-line bg-amber p-6 lg:p-7">
+        <p class="text-2xl font-semibold leading-tight tracking-[-0.015em]">Не знаете, к какому врачу?</p>
+        <div>
+          <p class="text-ink/80">Запишитесь на консультацию — направление можно не выбирать.</p>
+          <a href="#booking" data-book="consult" class="mt-4 inline-flex items-center gap-2 font-semibold underline decoration-2 underline-offset-[6px]">
+            К форме записи
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </a>
+        </div>
+      </li>
+    </ul>
   </div>
 </section>

@@ -1,0 +1,77 @@
+---
+import { Image } from 'astro:assets';
+import map from '../assets/photos/map-location.png';
+import SectionLabel from './SectionLabel.astro';
+import { clinic } from '../data/clinic';
+
+const yandex = clinic.ratings.find((r) => r.source === 'Яндекс Карты')!;
+const details = [
+  { term: 'Режим работы', value: 'Уточняйте по телефону' },
+  { term: 'Лицензия', value: 'Номер уточняется' },
+];
+---
+
+<footer id="contacts" class="on-dark bg-ink px-gutter pt-section pb-8 text-paper">
+  <div class="grid gap-x-gutter gap-y-12 lg:grid-cols-12">
+    <div class="flex flex-col lg:col-span-5">
+      <SectionLabel code="16" label="Контакты" tone="light" />
+      <p class="mt-6 text-[clamp(2.75rem,6vw,5rem)] font-bold leading-[0.95] tracking-[-0.035em]">Дентика</p>
+      <p class="mt-2 font-mono text-sm text-paper/60">стоматология для взрослых и детей</p>
+
+      <dl class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+        <div>
+          <dt class="font-mono text-[11px] uppercase tracking-[0.14em] text-paper/55">Адрес</dt>
+          <dd class="mt-2 text-lg leading-snug">
+            Казань, {clinic.address}
+            <span class="mt-1 block text-base text-paper/60">{clinic.district}</span>
+          </dd>
+        </div>
+        <div>
+          <dt class="font-mono text-[11px] uppercase tracking-[0.14em] text-paper/55">Телефон</dt>
+          <dd class="mt-2">
+            <a href={clinic.phoneHref} class="font-mono text-xl text-amber hover:underline">{clinic.phoneDisplay}</a>
+          </dd>
+        </div>
+        {details.map((d) => (
+          <div>
+            <dt class="font-mono text-[11px] uppercase tracking-[0.14em] text-paper/55">{d.term}</dt>
+            <dd class="mt-2 text-paper/80">{d.value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <div class="mt-10 flex flex-wrap gap-3">
+        {clinic.ratings.map((r) => (
+          <a href={r.href} target="_blank" rel="noopener" class="btn border border-paper/30 font-medium text-paper hover:border-paper">
+            {r.source}
+            <span class="font-mono text-amber">{r.score}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <a
+      href={yandex.href}
+      target="_blank"
+      rel="noopener"
+      class="group relative block aspect-[4/3] overflow-hidden rounded-ui sm:aspect-[16/10] lg:col-span-7 lg:aspect-auto lg:min-h-[520px]"
+      aria-label="Открыть Дентику в Яндекс Картах"
+    >
+      <Image
+        src={map}
+        alt="Фрагмент карты: расположение Дентики в Салават Купере"
+        widths={[640, 1000, 1630]}
+        sizes="(min-width: 1024px) 55vw, 100vw"
+        class="absolute inset-0 h-full w-full object-cover object-[54%_42%] transition-transform duration-700 group-hover:scale-[1.02]"
+      />
+      <span class="absolute bottom-3 left-3 rounded-md bg-paper px-2.5 py-1.5 font-mono text-xs text-ink">Открыть в Яндекс Картах</span>
+      <span class="absolute right-3 bottom-3 rounded-md bg-paper/90 px-2 py-1 font-mono text-[10px] text-ink-soft">© Яндекс Карты</span>
+    </a>
+  </div>
+
+  <div class="mt-16 flex flex-col gap-3 border-t border-paper/15 pt-6 font-mono text-xs text-paper/55 md:flex-row md:justify-between">
+    <span>Дентика · Казань</span>
+    <span class="text-amber">Версия 4.Тест — демо-сайт для сравнения</span>
+    <span>Форма записи не отправляет данные</span>
+  </div>
+</footer>
