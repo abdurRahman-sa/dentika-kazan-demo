@@ -1,0 +1,391 @@
+---
+import { bookingDirections, bookingTimes, isBusy } from '../data/clinic';
+import Icon from './Icon.astro';
+
+// Даты считаются от дня сборки; в браузере пересчитываются от сегодняшнего дня.
+const WD = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+const days: Date[] = [];
+const cursor = new Date();
+while (days.length < 5) {
+  cursor.setDate(cursor.getDate() + 1);
+  if (cursor.getDay() % 6 !== 0) days.push(new Date(cursor));
+}
+const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
+---
+
+<section id="booking" class="booking field">
+  <div class="wrap">
+    <div class="b-head">
+      <h2 class="h2">Запись на приём</h2>
+      <p>Выберите направление, день и время. Администратор перезвонит и подтвердит запись.</p>
+    </div>
+
+    <form class="b-panel" data-booking novalidate>
+      <fieldset class="col col-dir">
+        <legend class="col-title">Направление</legend>
+        <div class="pills">
+          {bookingDirections.map((dir, i) => (
+            <label class="pill">
+              <input type="radio" name="dir" value={dir} checked={i === DEFAULT_DIR} />
+              <span>{dir}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset class="col col-time">
+        <legend class="col-title">День и время</legend>
+        <div class="days">
+          {days.map((d, i) => (
+            <label class="day">
+              <input type="radio" name="day" value={i} checked={i === 0} />
+              <span><small data-wd>{WD[d.getDay()]}</small><b data-dn>{d.getDate()}</b></span>
+            </label>
+          ))}
+        </div>
+        <div class="slots">
+          {bookingTimes.map((time, i) => (
+            <label class="slot">
+              <input type="radio" name="time" value={time} disabled={isBusy(0, i)} aria-label={isBusy(0, i) ? `${time}, занято` : time} />
+              <span>{time}</span>
+            </label>
+          ))}
+        </div>
+        <p class="legend">
+          <span><i class="sw sw-free"></i>свободно</span>
+          <span><i class="sw sw-sel"></i>выбрано</span>
+          <span><i class="sw sw-busy"></i>занято</span>
+        </p>
+        <p class="demo">Демо: расписание условное, реальные окна даст клиника.</p>
+        <p class="err" data-err="time" hidden><Icon name="alert" />Выберите свободное время</p>
+      </fieldset>
+
+      <div class="col col-contact" data-contact>
+        <p class="col-title">Ваши данные</p>
+        <p class="summary" data-summary aria-live="polite">{bookingDirections[DEFAULT_DIR]}. Выберите время</p>
+        <label class="inp">
+          <span>Имя</span>
+          <input name="name" autocomplete="name" placeholder="Как к вам обращаться" />
+        </label>
+        <p class="err" data-err="name" hidden><Icon name="alert" />Укажите имя</p>
+        <label class="inp">
+          <span>Телефон</span>
+          <input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" />
+        </label>
+        <p class="err" data-err="phone" hidden><Icon name="alert" />Нужно 10 цифр после +7</p>
+        <label class="consent">
+          <input type="checkbox" name="consent" />
+          <i aria-hidden="true"></i>
+          <span>Согласен на обработку персональных данных. Политика обработки данных на демо-сайте пока заглушка.</span>
+        </label>
+        <p class="err" data-err="consent" hidden><Icon name="alert" />Нужно согласие на обработку данных</p>
+        <button class="btn btn-dark submit" type="submit">Записаться</button>
+        <p class="demo">Демо: данные никуда не отправляются.</p>
+      </div>
+
+      <div class="col col-contact done" data-done hidden>
+        <p class="col-title" tabindex="-1" data-done-title>Заявка принята</p>
+        <p class="done-text" data-done-text></p>
+        <p class="demo">Это демо-версия сайта: данные никуда не отправлены.</p>
+        <button type="button" class="btn btn-outline" data-reset>Выбрать другое время</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<style is:global>
+  .booking { padding: var(--sec-y) 0; }
+  .booking .b-head { text-align: center; }
+  .booking .b-head p { max-width: 560px; margin: 12px auto 0; color: var(--color-ink-2); }
+
+  .booking .b-panel {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr) 380px;
+    max-width: 1200px;
+    margin: 32px auto 0;
+    border-radius: 32px;
+    background: rgba(255, 255, 255, .84);
+    box-shadow: 0 20px 44px rgba(27, 44, 52, .14);
+  }
+  .booking .col { min-inline-size: 0; margin: 0; padding: 36px 32px; border: 0; }
+  .booking .col-dir, .booking .col-time { border-right: 1px solid #DCE5E9; }
+  .booking .col-contact { grid-column: 3; }
+  .booking .col-title {
+    float: left;
+    width: 100%;
+    margin: 0 0 18px;
+    padding: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 1.2;
+  }
+  .booking .col-title + * { clear: both; }
+  .booking .col-title:focus { outline: none; }
+
+  .booking input[type='radio'],
+  .booking input[type='checkbox'] { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .booking label { position: relative; }
+
+  .booking .pills { display: flex; flex-direction: column; gap: 10px; }
+  .booking .pill span {
+    display: block;
+    padding: 12px 16px;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+  }
+  .booking .pill span:hover { border-color: var(--color-ink-2); }
+
+  .booking .days { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+  .booking .day span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 64px;
+    border: 1px solid var(--color-line);
+    border-radius: 14px;
+    font-size: 13px;
+    color: var(--color-ink-2);
+    cursor: pointer;
+    transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  .booking .day span:hover { border-color: var(--color-ink-2); }
+  .booking .day b { font-family: var(--font-display); font-weight: 600; font-size: 20px; line-height: 1.1; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+
+  .booking .slots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 20px; }
+  .booking .slot span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 52px;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 17px;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+  }
+  .booking .slot span:hover { border-color: var(--color-ink-2); }
+  .booking .slot input:disabled + span { color: #8E9DA3; border-color: #E1E9EC; text-decoration: line-through; cursor: not-allowed; }
+
+  /* Выбранное подсвечено холодным светом постамента */
+  .booking .pill input:checked + span,
+  .booking .day input:checked + span,
+  .booking .slot input:checked + span {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+    color: var(--color-mist);
+    box-shadow: 0 0 0 3px var(--color-light-b), 0 6px 16px rgba(127, 211, 240, .35);
+  }
+  .booking .day input:checked + span { color: var(--color-ink-3); }
+  .booking .day input:checked + span b { color: var(--color-mist); }
+
+  .booking input:focus-visible + span,
+  .booking input:focus-visible + i { outline: 2px solid var(--color-ink); outline-offset: 4px; }
+
+  .booking .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 18px; font-size: 14px; color: var(--color-ink-2); }
+  .booking .sw { display: inline-block; width: 14px; height: 14px; margin-right: 8px; border-radius: 4px; vertical-align: -2px; border: 1px solid var(--color-line); }
+  .booking .sw-sel { background: var(--color-ink); border-color: var(--color-ink); box-shadow: 0 0 0 2px var(--color-light-b); }
+  .booking .sw-busy { background: #EEF3F5; border-color: #E1E9EC; }
+
+  .booking .summary { min-height: 2.8em; margin: 0 0 4px; font-family: var(--font-display); font-weight: 500; font-size: 16px; line-height: 1.4; }
+
+  .booking .inp { display: block; margin-top: 16px; }
+  .booking .inp span { display: block; margin-bottom: 2px; font-size: 13px; color: var(--color-ink-2); }
+  .booking .inp input {
+    width: 100%;
+    padding: 8px 0 12px;
+    border: 0;
+    border-bottom: 1px solid #BFCDD3;
+    border-radius: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 17px;
+    color: var(--color-ink);
+    caret-color: var(--color-ink);
+    transition: border-color .2s ease, box-shadow .2s ease;
+  }
+  .booking .inp input::placeholder { color: #6A7B82; }
+  .booking .inp input:focus { outline: none; border-bottom-color: var(--color-ink); box-shadow: 0 1px 0 var(--color-ink); }
+  .booking .inp input[aria-invalid='true'] { border-bottom-color: var(--color-ink); box-shadow: 0 2px 0 var(--color-ink); }
+
+  .booking .consent { display: flex; gap: 12px; align-items: flex-start; margin-top: 22px; font-size: 14px; line-height: 1.45; color: var(--color-ink-2); cursor: pointer; }
+  .booking .consent i {
+    flex: none;
+    display: block;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+    border: 1.5px solid var(--color-ink-2);
+    border-radius: 6px;
+    transition: background-color .2s ease, border-color .2s ease;
+  }
+  .booking .consent input:checked + i {
+    border-color: var(--color-ink);
+    background: var(--color-ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23F7FAFB' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 10.5l3.2 3L15 7'/%3E%3C/svg%3E") center / 18px no-repeat;
+  }
+
+  .booking .err { display: flex; align-items: center; gap: 6px; margin: 8px 0 0; font-size: 13px; font-weight: 600; color: var(--color-ink); }
+  .booking .err[hidden] { display: none; }
+  .booking .submit { width: 100%; margin-top: 24px; }
+  .booking .demo { margin: 14px 0 0; font-size: 13px; color: var(--color-ink-2); }
+  .booking .done-text { font-size: 17px; line-height: 1.5; }
+  .booking .done .btn { margin-top: 24px; }
+
+  @media (max-width: 1180px) {
+    .booking .b-panel { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .booking .col-dir { grid-column: 1 / -1; border-right: 0; border-bottom: 1px solid #DCE5E9; }
+    .booking .col-dir .pills { flex-direction: row; flex-wrap: wrap; }
+    .booking .col-contact { grid-column: 2; }
+  }
+  @media (max-width: 760px) {
+    .booking .b-panel { grid-template-columns: minmax(0, 1fr); border-radius: 24px; }
+    .booking .col { padding: 24px 20px; }
+    .booking .col-time { border-right: 0; border-bottom: 1px solid #DCE5E9; }
+    .booking .col-contact { grid-column: 1; }
+    .booking .days { gap: 6px; }
+    .booking .slots { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .booking .pill span { padding: 10px 14px; font-size: 15px; }
+  }
+</style>
+
+<script>
+  import { isBusy } from '../data/clinic';
+
+  const form = document.querySelector<HTMLFormElement>('[data-booking]');
+
+  if (form) {
+    const WD = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+    const WD_CAP = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+    const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+
+    const days: Date[] = [];
+    const cursor = new Date();
+    while (days.length < 5) {
+      cursor.setDate(cursor.getDate() + 1);
+      if (cursor.getDay() % 6 !== 0) days.push(new Date(cursor));
+    }
+    form.querySelectorAll<HTMLElement>('.day').forEach((el, i) => {
+      el.querySelector('[data-wd]')!.textContent = WD_CAP[days[i].getDay()];
+      el.querySelector('[data-dn]')!.textContent = String(days[i].getDate());
+    });
+
+    const q = <T extends Element>(sel: string) => form.querySelector<T>(sel)!;
+    const checked = (name: string) => form.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value ?? '';
+    const timeInputs = [...form.querySelectorAll<HTMLInputElement>('input[name="time"]')];
+    const summary = q<HTMLElement>('[data-summary]');
+    const contact = q<HTMLElement>('[data-contact]');
+    const done = q<HTMLElement>('[data-done]');
+    const nameInput = q<HTMLInputElement>('input[name="name"]');
+    const phoneInput = q<HTMLInputElement>('input[name="phone"]');
+    const consentInput = q<HTMLInputElement>('input[name="consent"]');
+
+    const setErr = (key: string, show: boolean) => {
+      q<HTMLElement>(`[data-err="${key}"]`).hidden = !show;
+    };
+
+    const applyBusy = () => {
+      const day = Number(checked('day'));
+      timeInputs.forEach((input, index) => {
+        const busy = isBusy(day, index);
+        input.disabled = busy;
+        if (busy) input.checked = false;
+        input.setAttribute('aria-label', busy ? `${input.value}, занято` : input.value);
+      });
+    };
+
+    const describe = () => {
+      const day = days[Number(checked('day'))];
+      const time = checked('time');
+      return time ? `${checked('dir')}, ${WD[day.getDay()]} ${day.getDate()} ${MONTHS[day.getMonth()]}, ${time}` : '';
+    };
+
+    const render = () => {
+      summary.textContent = describe() || `${checked('dir')}. Выберите время`;
+    };
+
+    form.addEventListener('change', (event) => {
+      const target = event.target as HTMLInputElement;
+      if (target.name === 'day') applyBusy();
+      if (target.name === 'time') setErr('time', false);
+      if (target.name === 'consent' && target.checked) setErr('consent', false);
+      render();
+    });
+
+    const digits = (value: string) => {
+      let d = value.replace(/\D/g, '');
+      if (d.startsWith('7') || d.startsWith('8')) d = d.slice(1);
+      return d.slice(0, 10);
+    };
+
+    phoneInput.addEventListener('input', () => {
+      const d = digits(phoneInput.value);
+      if (!d) {
+        phoneInput.value = '';
+        return;
+      }
+      let out = `+7 (${d.slice(0, 3)}`;
+      if (d.length > 3) out += `) ${d.slice(3, 6)}`;
+      if (d.length > 6) out += `-${d.slice(6, 8)}`;
+      if (d.length > 8) out += `-${d.slice(8, 10)}`;
+      phoneInput.value = out;
+      if (d.length === 10) setErr('phone', false);
+    });
+    nameInput.addEventListener('input', () => {
+      if (nameInput.value.trim().length > 1) {
+        setErr('name', false);
+        nameInput.removeAttribute('aria-invalid');
+      }
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const checks: [string, boolean, HTMLElement][] = [
+        ['time', Boolean(checked('time')), timeInputs.find((i) => !i.disabled) ?? timeInputs[0]],
+        ['name', nameInput.value.trim().length > 1, nameInput],
+        ['phone', digits(phoneInput.value).length === 10, phoneInput],
+        ['consent', consentInput.checked, consentInput],
+      ];
+      let first: HTMLElement | null = null;
+      checks.forEach(([key, ok, el]) => {
+        setErr(key, !ok);
+        if (el instanceof HTMLInputElement && el.type !== 'radio' && el.type !== 'checkbox') {
+          if (ok) el.removeAttribute('aria-invalid');
+          else el.setAttribute('aria-invalid', 'true');
+        }
+        if (!ok && !first) first = el;
+      });
+      if (first) {
+        (first as HTMLElement).focus();
+        return;
+      }
+      q<HTMLElement>('[data-done-text]').textContent = `${nameInput.value.trim()}, ${describe()}. Администратор перезвонит на номер ${phoneInput.value}.`;
+      contact.hidden = true;
+      done.hidden = false;
+      q<HTMLElement>('[data-done-title]').focus();
+    });
+
+    q<HTMLButtonElement>('[data-reset]').addEventListener('click', () => {
+      form.reset();
+      ['time', 'name', 'phone', 'consent'].forEach((key) => setErr(key, false));
+      nameInput.removeAttribute('aria-invalid');
+      phoneInput.removeAttribute('aria-invalid');
+      applyBusy();
+      render();
+      done.hidden = true;
+      contact.hidden = false;
+      nameInput.focus();
+    });
+
+    applyBusy();
+    render();
+  }
+</script>

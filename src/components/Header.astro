@@ -1,0 +1,91 @@
+---
+import { clinic } from '../data/clinic';
+
+const links = [
+  ['#treat', 'Что лечим'],
+  ['#clinic', 'Клиника'],
+  ['#visit', 'Первый визит'],
+  ['#contacts', 'Контакты'],
+];
+---
+
+<header class="site-header" data-header>
+  <div class="bar">
+    <a href="#top" class="logo">Dentika</a>
+    <nav aria-label="Разделы страницы">
+      <ul>
+        {links.map(([href, text]) => <li><a href={href}>{text}</a></li>)}
+      </ul>
+    </nav>
+    <a class="tel" href={clinic.phoneHref}>{clinic.phoneDisplay}</a>
+    <a class="cta" href="#booking">Записаться</a>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    transition: background-color .3s ease, box-shadow .3s ease;
+  }
+  .site-header[data-scrolled] {
+    background: rgba(247, 250, 251, .95);
+    box-shadow: 0 1px 0 var(--color-rule);
+  }
+  .bar {
+    max-width: 1440px;
+    margin: 0 auto;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    padding: 0 var(--pad-x);
+  }
+  .site-header[data-scrolled] .bar { height: 72px; }
+  .logo {
+    margin-right: auto;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  ul { display: flex; gap: 36px; list-style: none; margin: 0; padding: 0; }
+  nav a, .tel { color: var(--color-ink); text-decoration: none; font-size: 15px; }
+  nav a:hover {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-color: var(--color-mist-3);
+  }
+  .tel { font-family: var(--font-display); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .cta {
+    display: none;
+    align-items: center;
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 12px;
+    background: var(--color-ink);
+    color: var(--color-mist);
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 15px;
+    text-decoration: none;
+  }
+  .site-header[data-scrolled] .cta { display: inline-flex; }
+
+  @media (max-width: 960px) {
+    nav, .tel { display: none; }
+    .bar, .site-header[data-scrolled] .bar { height: 68px; gap: 16px; }
+    .logo { font-size: 22px; }
+    .cta { display: inline-flex; }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const sync = () => header?.toggleAttribute('data-scrolled', window.scrollY > 24);
+  window.addEventListener('scroll', sync, { passive: true });
+  sync();
+</script>

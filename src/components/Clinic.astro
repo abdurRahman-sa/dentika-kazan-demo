@@ -1,0 +1,47 @@
+---
+import Icon from './Icon.astro';
+---
+
+<section id="clinic" class="clinic">
+  <div class="wrap grid">
+    <div class="ph big">
+      <div class="title">
+        <h2 class="h2">Клиника</h2>
+        <p>Кабинеты, ресепшен и зона ожидания.</p>
+      </div>
+      <span class="ph-label"><Icon name="camera" />Место под фото кабинета</span>
+    </div>
+    <div class="ph small"><span class="ph-label"><Icon name="camera" />Место под фото ресепшена</span></div>
+    <div class="ph small"><span class="ph-label"><Icon name="camera" />Место под фото зоны ожидания</span></div>
+  </div>
+</section>
+
+<style>
+  .clinic { padding: var(--sec-y) 0; background: var(--color-flat); }
+  .grid {
+    display: grid;
+    grid-template-columns: 1.72fr 1fr;
+    grid-template-rows: repeat(2, clamp(180px, 18.3vw, 264px));
+    gap: 16px;
+  }
+  .big { grid-row: span 2; }
+  .title {
+    position: absolute;
+    left: clamp(16px, 2.8vw, 40px);
+    top: clamp(16px, 2.8vw, 40px);
+    max-width: 380px;
+    padding: 28px 32px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, .84);
+    box-shadow: 0 20px 44px rgba(27, 44, 52, .14);
+  }
+  .title p { margin-top: 10px; color: var(--color-ink-2); }
+
+  @media (max-width: 720px) {
+    .grid { grid-template-columns: 1fr 1fr; grid-template-rows: none; gap: 10px; }
+    .big { grid-column: span 2; grid-row: auto; aspect-ratio: 4 / 3.6; }
+    .small { aspect-ratio: 1; align-items: flex-end; }
+    .small .ph-label { font-size: 13px; }
+    .title { padding: 18px 20px; left: 14px; top: 14px; right: 14px; }
+  }
+</style>

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+.env*
+.DS_Store
+.vercel/
+
+# Impeccable: скриншоты проверок, черновые макеты и служебные кэши остаются только на диске
+.impeccable/review/
+.impeccable/mocks/
+.impeccable/questions/
+.impeccable/hook.cache.json

@@ -1,0 +1,76 @@
+---
+const steps = [
+  ['Запись', 'На сайте или по телефону'],
+  ['Осмотр', 'Врач составляет план лечения'],
+  ['Лечение', 'По согласованному плану'],
+];
+---
+
+<section id="visit" class="visit field">
+  <div class="wrap inner">
+    <div class="intro">
+      <h2 class="h2">Первый визит</h2>
+      <p>Три шага от звонка до лечения.</p>
+    </div>
+    <ol class="steps">
+      {steps.map(([title, text], i) => (
+        <li style={`--i:${i}`}>
+          <h3>{title}</h3>
+          <p>{text}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .visit { padding-top: var(--sec-y); }
+  .inner {
+    display: grid;
+    grid-template-columns: minmax(260px, 340px) 1fr;
+    gap: 32px 56px;
+    align-items: end;
+  }
+  .intro { align-self: start; }
+  .intro p { margin-top: 14px; color: var(--color-ink-2); }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    position: relative;
+    height: calc(120px + var(--i) * 60px);
+    padding: 24px;
+    border-radius: 18px 18px 0 0;
+    background: linear-gradient(180deg, #FFFFFF, #D3DFE4);
+  }
+  li::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 0;
+    height: 3px;
+    border-radius: 2px;
+    background: #FFFFFF;
+    box-shadow: 0 2px 12px rgba(127, 211, 240, .7);
+  }
+  h3 { font-size: 22px; line-height: 1.2; letter-spacing: -0.01em; }
+  li p { margin-top: 4px; font-size: 15px; line-height: 1.4; color: var(--color-ink-2); }
+
+  @media (max-width: 900px) {
+    .inner { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 720px) {
+    .steps { gap: 6px; }
+    li { height: calc(150px + var(--i) * 50px); padding: 16px 12px; border-radius: 14px 14px 0 0; }
+    li::before { left: 10px; right: 10px; }
+    h3 { font-size: 17px; }
+    li p { font-size: 13px; }
+  }
+</style>

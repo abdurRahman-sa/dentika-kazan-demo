@@ -1,0 +1,61 @@
+---
+import { clinic } from '../data/clinic';
+import Icon from './Icon.astro';
+---
+
+<section id="contacts" class="contacts">
+  <div class="wrap grid">
+    <div class="ph map"><span class="ph-label"><Icon name="pin" />Место под карту</span></div>
+    <div class="info">
+      <h2 class="h2">Контакты</h2>
+      <address>
+        <span class="addr">{clinic.address}</span>
+        <span>{clinic.district}</span>
+      </address>
+      <a class="phone" href={clinic.phoneHref}>{clinic.phoneDisplay}</a>
+      <a class="btn btn-dark route" href={clinic.mapHref} target="_blank" rel="noopener">
+        <Icon name="pin" />Построить маршрут
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contacts { padding: var(--sec-y) 0; background: var(--color-flat); }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.64fr) minmax(0, 1fr);
+    gap: clamp(24px, 4vw, 56px);
+    align-items: start;
+  }
+  .map {
+    height: clamp(260px, 26.4vw, 380px);
+    background: repeating-linear-gradient(45deg, #D8E3E7 0 10px, #E5EDF0 10px 20px);
+  }
+  .info { padding-top: 16px; }
+  address {
+    display: flex;
+    flex-direction: column;
+    margin-top: 18px;
+    font-style: normal;
+    color: var(--color-ink-2);
+  }
+  .addr { color: var(--color-ink); }
+  .phone {
+    display: inline-block;
+    margin-top: 28px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(28px, 2.4vw, 34px);
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+    text-decoration: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .route { display: flex; width: fit-content; margin-top: 32px; }
+
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: 1fr; }
+    .info { padding-top: 0; }
+  }
+</style>
