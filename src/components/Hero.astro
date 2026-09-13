@@ -1,6 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import { clinic } from '../data/clinic';
-import Icon from './Icon.astro';
+import tooth from '../assets/hero-tooth.png';
 ---
 
 <section id="top" class="hero" data-hero>
@@ -25,7 +26,7 @@ import Icon from './Icon.astro';
         <div class="ped-top"><i class="sweep"></i></div>
         <div class="ped-ring"></div>
         <div class="object">
-          <span class="ph-label"><Icon name="camera" />Место под 3D-зуб</span>
+          <Image src={tooth} alt="" widths={[210, 420, 630]} sizes="210px" loading="eager" fetchpriority="high" />
         </div>
         <p class="chip chip-l"><b>Хирургия и имплантация</b>для взрослых</p>
         <p class="chip chip-r"><b>Ортодонтия</b>для детей и взрослых</p>
@@ -123,19 +124,30 @@ import Icon from './Icon.astro';
     transform-origin: 50% 72%;
     transform: translateY(calc(var(--ps) * -1 * var(--rise, 150px))) scale(calc(1 + var(--ps) * var(--zoom, .22)));
   }
+  /* Зуб стоит кончиками корней на центре верхней грани постамента (y около 318) */
   .object {
     position: absolute;
-    left: 190px;
-    top: 0;
+    left: 215px;
+    top: -17px;
     z-index: 2;
-    width: 260px;
-    height: 290px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 120px 120px 60px 60px;
-    background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(214, 226, 231, .92));
-    box-shadow: 0 calc(30px + var(--ps) * 20px) calc(50px + var(--ps) * 30px) rgba(27, 44, 52, .18);
+    width: 210px;
+  }
+  .object :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 calc(18px + var(--ps) * 14px) calc(24px + var(--ps) * 16px) rgba(27, 44, 52, .22));
+  }
+  .object::after {
+    content: '';
+    position: absolute;
+    left: 14%;
+    right: 14%;
+    bottom: -4px;
+    z-index: -1;
+    height: 26px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(27, 44, 52, .28), transparent);
   }
   .ped-top {
     position: absolute;
@@ -247,7 +259,7 @@ import Icon from './Icon.astro';
       opacity: calc(1 - min(1, var(--ps) * 2.4));
     }
     .chip-m {
-      max-width: min(44%, 230px);
+      max-width: min(36%, 230px);
       padding: 10px 14px;
       border-radius: 14px;
       background: rgba(255, 255, 255, .82);
@@ -267,7 +279,7 @@ import Icon from './Icon.astro';
     .acts { margin-top: 22px; }
   }
   @media (max-width: 720px) and (max-height: 740px) {
-    .hero { --s: .38; --lift: 0px; }
+    .hero { --s: .36; --lift: 0px; }
     .lead { font-size: 16px; }
     .rates-inline { margin-top: 14px; }
     .rates-inline b { font-size: 18px; }
