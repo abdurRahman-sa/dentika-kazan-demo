@@ -186,7 +186,7 @@ const mobileMarkers = numbered
     color: var(--color-ink);
   }
   /* На телефоне карточки узкие: заголовок меньше, текст может сжиматься и переноситься */
-  .treat .t-list b { font-size: calc(var(--card-title) * 15px / 18); }
+  .treat .t-list b { font-size: min(15px, calc(var(--card-title) * 15px / 18)); }
   .treat .t-list li > span:last-child { min-width: 0; overflow-wrap: break-word; hyphens: auto; }
   .treat .side-l { left: 0; }
   .treat .side-r { right: 0; }

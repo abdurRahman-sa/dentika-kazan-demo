@@ -2,14 +2,14 @@
 
 @theme {
   --color-mist: #F7FAFB;
-  --color-mist-2: #E6EEF1;
+  --color-mist-2: #C5CCCE;
   --color-mist-3: #C9D7DD;
-  --color-flat: #F3F7F8;
+  --color-flat: #F3FAFB;
   --color-ink: #1B2C34;
-  --color-ink-2: #44565E;
+  --color-ink-2: #2A3337;
   --color-ink-3: #B8C7CD;
   --color-light: #7FD3F0;
-  --color-light-b: #D9F6FF;
+  --color-light-b: #9EEFEC;
   --color-rule: #D5E0E4;
   --color-line: #CBD8DE;
   --color-milk: #9DB2BB;
@@ -24,13 +24,16 @@
 :root {
   /* Заголовки */
   --display-weight: 600;
-  --h1: 60;
+  --h1: 62;
   --h1-lh: 1.04;
   --h1-track: -0.02;
-  --h2: 40;
+  --h2: 42;
   --h2-lh: 1.1;
   --h2-track: -0.015;
-  --card-title: 18;
+  --card-title: 21;
+  /* Плашки направлений на первом экране (десктоп; на телефоне уменьшаются пропорционально) */
+  --chip-title: 20;
+  --chip-note: 16;
 
   /* Текст */
   --body: 17;
@@ -40,33 +43,33 @@
   --lead-lh: 1.45;
 
   /* Студийный свет на фоне секций */
-  --field-top: #F7FAFB;
-  --field-mid: #E6EEF1;
-  --field-bottom: #C9D7DD;
+  --field-top: #F2F3F3;
+  --field-mid: #EBF5F4;
+  --field-bottom: #DEE8ED;
 
   /* Сетка и ритм */
-  --content: 1440;
-  --gutter: 64;
+  --content: 1400;
+  --gutter: 60;
   --sec: 64;
   --step-base: 120;
-  --step-inc: 60;
+  --step-inc: 80;
 
   /* Форма */
   --radius: 28;
-  --round-k: 1;
+  --round-k: 1.35;
   --btn-h: 58;
   --btn-radius: 16;
   --btn-size: 17;
-  --shadow-k: 1;
-  --glow: 1;
+  --shadow-k: 0.3;
+  --glow: 1.95;
 
   /* Движение */
   --dur: 1;
   --ease-ui: ease;
-  --hero-anim: ease-out;
+  --hero-anim: linear;
   --pin: 50;
-  --rise-k: 1;
-  --zoom-k: 1;
+  --rise-k: 1.55;
+  --zoom-k: 0.4;
 
   /* Производные */
   --pad-x: clamp(calc(var(--gutter) * 20px / 64), calc(var(--gutter) * 4.4vw / 64), calc(var(--gutter) * 1px));

@@ -91,6 +91,8 @@ const CONTROLS: Control[] = [
   { group: G.hero, id: 'pin', label: 'Длина закрепления, % высоты экрана', type: 'range', min: 0, max: 200, step: 5, unit: '%' },
   { group: G.hero, id: 'rise-k', label: 'Подъём постамента', type: 'range', min: 0, max: 2.5, step: 0.05, unit: '×' },
   { group: G.hero, id: 'zoom-k', label: 'Приближение постамента', type: 'range', min: 0, max: 3, step: 0.05, unit: '×' },
+  { group: G.hero, id: 'chip-title', label: 'Плашки: заголовок', type: 'range', min: 12, max: 28, step: 1, unit: 'px' },
+  { group: G.hero, id: 'chip-note', label: 'Плашки: подпись', type: 'range', min: 10, max: 22, step: 1, unit: 'px' },
 
   { group: G.motion, id: 'dur', label: 'Длительность переходов', type: 'range', min: 0, max: 4, step: 0.05, unit: '×' },
   {
@@ -101,7 +103,6 @@ const CONTROLS: Control[] = [
       { value: 'ease-in-out', label: 'Плавная в обе стороны' },
       { value: 'linear', label: 'Линейная' },
       { value: 'cubic-bezier(0.16, 1, 0.3, 1)', label: 'Экспоненциальная' },
-      { value: 'cubic-bezier(0.34, 1.56, 0.64, 1)', label: 'С отскоком' },
     ],
   },
 ];
