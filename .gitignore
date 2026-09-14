@@ -6,3 +6,6 @@
 
 # Кэш детектора Impeccable, локальный для машины
 .impeccable/hook.cache.json
+
+# Мятная версия для Vercel: собирается скриптом scripts/build-mint.mjs при деплое
+site/
