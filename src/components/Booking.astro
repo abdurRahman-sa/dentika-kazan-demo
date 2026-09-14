@@ -1,5 +1,5 @@
 ---
-import { bookingDirections, bookingTimes, isBusy } from '../data/clinic';
+import { bookingTimes, directions, isBusy } from '../data/clinic';
 import Icon from './Icon.astro';
 
 // Даты считаются от дня сборки; в браузере пересчитываются от сегодняшнего дня.
@@ -10,7 +10,8 @@ while (days.length < 5) {
   cursor.setDate(cursor.getDate() + 1);
   if (cursor.getDay() % 6 !== 0) days.push(new Date(cursor));
 }
-const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
+const DEFAULT_DIR = 'orthodontics';
+const defaultLabel = directions.find((item) => item.id === DEFAULT_DIR)!.label;
 ---
 
 <section id="booking" class="booking field">
@@ -21,19 +22,19 @@ const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
     </div>
 
     <form class="b-panel" data-booking novalidate>
-      <fieldset class="col col-dir">
+      <fieldset class="col col-dir" data-choice>
         <legend class="col-title">Направление</legend>
         <div class="pills">
-          {bookingDirections.map((dir, i) => (
+          {directions.map((dir) => (
             <label class="pill">
-              <input type="radio" name="dir" value={dir} checked={i === DEFAULT_DIR} />
-              <span>{dir}</span>
+              <input type="radio" name="dir" value={dir.id} checked={dir.id === DEFAULT_DIR} />
+              <span>{dir.label}</span>
             </label>
           ))}
         </div>
       </fieldset>
 
-      <fieldset class="col col-time">
+      <fieldset class="col col-time" data-choice>
         <legend class="col-title">День и время</legend>
         <div class="days">
           {days.map((d, i) => (
@@ -62,10 +63,10 @@ const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
 
       <div class="col col-contact" data-contact>
         <p class="col-title">Ваши данные</p>
-        <p class="summary" data-summary aria-live="polite">{bookingDirections[DEFAULT_DIR]}. Выберите время</p>
+        <p class="summary" data-summary aria-live="polite">{defaultLabel}. Выберите время</p>
         <label class="inp">
           <span>Имя</span>
-          <input name="name" autocomplete="name" placeholder="Как к вам обращаться" />
+          <input name="name" autocomplete="name" maxlength="60" placeholder="Как к вам обращаться" />
         </label>
         <p class="err" data-err="name" hidden><Icon name="alert" />Укажите имя</p>
         <label class="inp">
@@ -84,8 +85,39 @@ const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
       </div>
 
       <div class="col col-contact done" data-done hidden>
+        <!-- Маленький подиум: на постаменте вместо зуба отметка, кольцо загорается как на первом экране -->
+        <svg class="done-mark" viewBox="0 0 200 130" aria-hidden="true">
+          <defs>
+            <linearGradient id="done-top" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#FFFFFF" />
+              <stop offset="1" stop-color="#E3EBEE" />
+            </linearGradient>
+            <linearGradient id="done-side" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#D3DFE4" />
+              <stop offset="1" stop-color="#B9C9D0" />
+            </linearGradient>
+            <filter id="done-blur" x="-30%" y="-80%" width="160%" height="260%">
+              <feGaussianBlur stdDeviation="5" />
+            </filter>
+          </defs>
+          <path d="M24 92v16a76 20 0 0 0 152 0V92z" fill="url(#done-side)" />
+          <ellipse cx="100" cy="92" rx="76" ry="20" fill="url(#done-top)" />
+          <ellipse class="dm-glow" cx="100" cy="101" rx="72" ry="19" filter="url(#done-blur)" />
+          <ellipse class="dm-ring" cx="100" cy="101" rx="72" ry="19" pathLength="1" />
+          <g class="dm-object">
+            <ellipse class="dm-shadow" cx="100" cy="90" rx="26" ry="6" filter="url(#done-blur)" />
+            <circle class="dm-disc" cx="100" cy="50" r="30" />
+            <path class="dm-check" d="M86.5 50.5l9.5 9.5 18-19" pathLength="1" />
+          </g>
+        </svg>
         <p class="col-title" tabindex="-1" data-done-title>Заявка принята</p>
-        <p class="done-text" data-done-text></p>
+        <dl class="done-card">
+          <div><dt>Направление</dt><dd data-done-field="dir"></dd></div>
+          <div><dt>День и время</dt><dd data-done-field="when"></dd></div>
+          <div><dt>Имя</dt><dd data-done-field="name"></dd></div>
+          <div><dt>Телефон</dt><dd data-done-field="phone"></dd></div>
+        </dl>
+        <p class="done-text">Администратор перезвонит на этот номер и подтвердит запись.</p>
         <p class="demo">Это демо-версия сайта: данные никуда не отправлены.</p>
         <button type="button" class="btn btn-outline" data-reset>Выбрать другое время</button>
       </div>
@@ -154,8 +186,7 @@ const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
     height: 64px;
     border: 1px solid var(--color-line);
     border-radius: calc(14px * var(--round-k));
-    font-size: 13px;
-    color: var(--color-ink-2);
+    color: var(--color-ink);
     cursor: pointer;
     transition:
       background-color calc(.2s * var(--dur)) var(--ease-ui),
@@ -163,6 +194,8 @@ const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
       box-shadow calc(.2s * var(--dur)) var(--ease-ui);
   }
   .booking .day span:hover { border-color: var(--color-ink-2); }
+  /* День недели того же цвета, что число, чтобы подпись читалась как часть даты */
+  .booking .day small { font-size: 14px; line-height: 1.2; color: var(--color-ink); }
   .booking .day b { font-family: var(--font-display); font-weight: var(--display-weight); font-size: 20px; line-height: 1.1; color: var(--color-ink); font-variant-numeric: tabular-nums; }
 
   .booking .slots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 20px; }
@@ -198,7 +231,7 @@ const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
       0 0 0 3px var(--color-light-b),
       0 6px calc(16px * var(--glow)) rgb(from var(--color-light) r g b / calc(.35 * min(1, var(--glow))));
   }
-  .booking .day input:checked + span { color: var(--color-ink-3); }
+  .booking .day input:checked + span small,
   .booking .day input:checked + span b { color: var(--color-mist); }
 
   .booking input:focus-visible + span,
@@ -254,8 +287,53 @@ const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
   .booking .err[hidden] { display: none; }
   .booking .submit { width: 100%; margin-top: 24px; }
   .booking .demo { margin: 14px 0 0; font-size: 13px; color: var(--color-ink-2); }
-  .booking .done-text { font-size: 17px; line-height: 1.5; }
-  .booking .done .btn { margin-top: 24px; }
+
+  /* Успех: колонки выбора притихают, пока открыта сводка */
+  .booking [data-choice] { transition: opacity calc(.35s * var(--dur)) var(--ease-ui); }
+  .booking .b-panel[data-state='done'] [data-choice] { opacity: .45; }
+
+  .booking .done-mark { display: block; width: 180px; height: auto; margin: -8px auto 6px; overflow: visible; }
+  .booking .done .col-title { text-align: center; }
+  .booking .dm-ring { fill: none; stroke: var(--color-light-b); stroke-width: 2.5; stroke-dasharray: 1; }
+  .booking .dm-glow { fill: none; stroke: var(--color-light); stroke-width: 7; opacity: calc(.8 * min(1, var(--glow))); }
+  .booking .dm-shadow { fill: rgb(27 44 52 / .22); }
+  .booking .dm-disc { fill: #FFFFFF; stroke: #DCE5E9; stroke-width: 1; }
+  .booking .dm-check { fill: none; stroke: var(--color-ink); stroke-width: 4.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; }
+
+  @keyframes done-draw { from { stroke-dashoffset: 1; } }
+  @keyframes done-glow { from { opacity: 0; } }
+  @keyframes done-rise { from { opacity: 0; transform: translateY(12px); } }
+  .booking .dm-ring { animation: done-draw calc(.9s * var(--dur)) cubic-bezier(.16, 1, .3, 1) backwards; }
+  .booking .dm-glow { animation: done-glow calc(1.2s * var(--dur)) cubic-bezier(.16, 1, .3, 1) calc(.2s * var(--dur)) backwards; }
+  .booking .dm-object { animation: done-rise calc(.7s * var(--dur)) cubic-bezier(.16, 1, .3, 1) calc(.15s * var(--dur)) backwards; }
+  .booking .dm-check { animation: done-draw calc(.45s * var(--dur)) cubic-bezier(.16, 1, .3, 1) calc(.55s * var(--dur)) backwards; }
+
+  .booking .done-card {
+    margin: 0;
+    padding: 2px 18px;
+    border-radius: calc(16px * var(--round-k));
+    background: var(--color-flat);
+    box-shadow: inset 0 0 0 1px var(--color-rule);
+  }
+  .booking .done-card div { padding: 11px 0; }
+  .booking .done-card div + div { border-top: 1px solid var(--color-rule); }
+  .booking .done-card dt { font-size: 13px; line-height: 1.3; color: var(--color-ink-2); }
+  .booking .done-card dd {
+    margin: 2px 0 0;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 1.35;
+    color: var(--color-ink);
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+  }
+  .booking .done-text { margin: 16px 0 0; font-size: 15px; line-height: 1.5; color: var(--color-ink-2); }
+  .booking .done .btn { width: 100%; margin-top: 20px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .booking .done-mark * { animation: none !important; }
+  }
 
   @media (max-width: 1180px) {
     .booking .b-panel { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
@@ -275,14 +353,14 @@ const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
 </style>
 
 <script>
-  import { isBusy } from '../data/clinic';
+  import { directions, isBusy } from '../data/clinic';
 
   const form = document.querySelector<HTMLFormElement>('[data-booking]');
 
   if (form) {
-    const WD = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
     const WD_CAP = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
     const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+    const HEADER_OFFSET = 88;
 
     const days: Date[] = [];
     const cursor = new Date();
@@ -298,12 +376,21 @@ const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
     const q = <T extends Element>(sel: string) => form.querySelector<T>(sel)!;
     const checked = (name: string) => form.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value ?? '';
     const timeInputs = [...form.querySelectorAll<HTMLInputElement>('input[name="time"]')];
+    const choices = [...form.querySelectorAll<HTMLElement>('[data-choice]')];
     const summary = q<HTMLElement>('[data-summary]');
     const contact = q<HTMLElement>('[data-contact]');
     const done = q<HTMLElement>('[data-done]');
+    const doneTitle = q<HTMLElement>('[data-done-title]');
     const nameInput = q<HTMLInputElement>('input[name="name"]');
     const phoneInput = q<HTMLInputElement>('input[name="phone"]');
     const consentInput = q<HTMLInputElement>('input[name="consent"]');
+
+    const labelOf = (id: string) => directions.find((item) => item.id === id)?.label ?? '';
+    const isDone = () => form.dataset.state === 'done';
+    const inView = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      return r.top >= HEADER_OFFSET && r.bottom <= window.innerHeight;
+    };
 
     const setErr = (key: string, show: boolean) => {
       q<HTMLElement>(`[data-err="${key}"]`).hidden = !show;
@@ -319,14 +406,14 @@ const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
       });
     };
 
-    const describe = () => {
+    const when = () => {
       const day = days[Number(checked('day'))];
-      const time = checked('time');
-      return time ? `${checked('dir')}, ${WD[day.getDay()]} ${day.getDate()} ${MONTHS[day.getMonth()]}, ${time}` : '';
+      return `${WD_CAP[day.getDay()]}, ${day.getDate()} ${MONTHS[day.getMonth()]}, ${checked('time')}`;
     };
+    const describe = () => (checked('time') ? `${labelOf(checked('dir'))}, ${when()}` : '');
 
     const render = () => {
-      summary.textContent = describe() || `${checked('dir')}. Выберите время`;
+      summary.textContent = describe() || `${labelOf(checked('dir'))}. Выберите время`;
     };
 
     form.addEventListener('change', (event) => {
@@ -335,6 +422,24 @@ const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
       if (target.name === 'time') setErr('time', false);
       if (target.name === 'consent' && target.checked) setErr('consent', false);
       render();
+    });
+
+    // Плашки направлений и зубы на схеме «Что лечим» выбирают направление и ведут к записи.
+    // Пока открыта сводка принятой заявки, выбор не меняется, чтобы она не расходилась с формой.
+    document.addEventListener('click', (event) => {
+      const trigger = (event.target as Element).closest('[data-book]');
+      if (!trigger) return;
+      const id = trigger.getAttribute('data-book');
+      const input = id ? form.querySelector<HTMLInputElement>(`input[name="dir"][value="${id}"]`) : null;
+      if (input && !isDone()) {
+        input.checked = true;
+        render();
+      }
+      // У ссылок переход к записи штатный, у фигур на схеме его нет.
+      // Прокрутка через кадр, чтобы завершение касания на телефоне не оборвало её
+      if (!(trigger instanceof HTMLAnchorElement)) {
+        requestAnimationFrame(() => form.closest('section')?.scrollIntoView({ block: 'start' }));
+      }
     });
 
     const digits = (value: string) => {
@@ -365,6 +470,7 @@ const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
+      if (isDone()) return;
       const checks: [string, boolean, HTMLElement][] = [
         ['time', Boolean(checked('time')), timeInputs.find((i) => !i.disabled) ?? timeInputs[0]],
         ['name', nameInput.value.trim().length > 1, nameInput],
@@ -384,22 +490,42 @@ const DEFAULT_DIR = bookingDirections.indexOf('Ортодонтия');
         (first as HTMLElement).focus();
         return;
       }
-      q<HTMLElement>('[data-done-text]').textContent = `${nameInput.value.trim()}, ${describe()}. Администратор перезвонит на номер ${phoneInput.value}.`;
+
+      const fields: Record<string, string> = {
+        dir: labelOf(checked('dir')),
+        when: when(),
+        name: nameInput.value.trim(),
+        phone: phoneInput.value,
+      };
+      form.querySelectorAll<HTMLElement>('[data-done-field]').forEach((el) => {
+        el.textContent = fields[el.dataset.doneField ?? ''] ?? '';
+      });
+      form.dataset.state = 'done';
+      choices.forEach((col) => (col.inert = true));
       contact.hidden = true;
       done.hidden = false;
-      q<HTMLElement>('[data-done-title]').focus();
+      // Сначала фокус без прокрутки, потом прокрутка: иначе фокус обрывает плавный скролл.
+      // На телефоне сводка может оказаться под шапкой или уйти ниже экрана: тогда подиум ставится под шапку
+      doneTitle.focus({ preventScroll: true });
+      const doneTop = done.getBoundingClientRect().top;
+      if (doneTop < HEADER_OFFSET || doneTop > window.innerHeight * 0.4) {
+        requestAnimationFrame(() => done.scrollIntoView({ block: 'start' }));
+      }
     });
 
+    // Сбрасывается только время: направление, день и контакты остаются
     q<HTMLButtonElement>('[data-reset]').addEventListener('click', () => {
-      form.reset();
-      ['time', 'name', 'phone', 'consent'].forEach((key) => setErr(key, false));
-      nameInput.removeAttribute('aria-invalid');
-      phoneInput.removeAttribute('aria-invalid');
-      applyBusy();
+      timeInputs.forEach((input) => (input.checked = false));
+      setErr('time', false);
+      delete form.dataset.state;
+      choices.forEach((col) => (col.inert = false));
       render();
       done.hidden = true;
       contact.hidden = false;
-      nameInput.focus();
+      const slot = timeInputs.find((input) => !input.disabled);
+      const label = slot?.closest('label');
+      if (label && !inView(label)) label.scrollIntoView({ block: 'center' });
+      slot?.focus({ preventScroll: true });
     });
 
     applyBusy();

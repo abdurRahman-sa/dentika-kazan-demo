@@ -1,5 +1,6 @@
 ---
-import { treatments } from '../data/clinic';
+import { direction, treatments } from '../data/clinic';
+import Icon from './Icon.astro';
 
 // Зубной ряд строится при сборке: постоянные зубы по внешнему эллипсу, молочные по внутреннему.
 type Tooth = { x: number; y: number; w: number; h: number; rot: number };
@@ -44,31 +45,42 @@ const f = (n: number) => n.toFixed(1);
 const rect = (t: Tooth, cls = '') =>
   `<rect${cls ? ` class="${cls}"` : ''} x="${f(t.x - t.w / 2)}" y="${f(t.y - t.h / 2)}" width="${f(t.w)}" height="${f(t.h)}" rx="${f(t.h * 0.45)}" transform="rotate(${f(t.rot)} ${f(t.x)} ${f(t.y)})"/>`;
 
+// Любой зуб ведёт к записи; зуб с выноской ещё и выбирает своё направление
 const implant = treatments.find((item) => item.ring);
 const archSvg =
-  `<g class="milk">${[...teeth.mu, ...teeth.ml].map((t) => rect(t)).join('')}</g>` +
-  `<g class="perm">${teeth.u.map((t) => rect(t)).join('')}${teeth.l
+  `<g class="milk" data-book="">${[...teeth.mu, ...teeth.ml].map((t) => rect(t)).join('')}</g>` +
+  `<g class="perm" data-book="">${teeth.u.map((t) => rect(t)).join('')}${teeth.l
     .map((t, i) => rect(t, implant && implant.tooth[0] === 'l' && implant.tooth[1] === i ? 'hl' : ''))
     .join('')}</g>`;
 
+// Плашка занимает 19.5% ширины схемы (234 из 1200), выноска начинается в 10 единицах от её края
 const leaders = treatments
   .map((item) => {
     const t = teeth[item.tooth[0]][item.tooth[1]];
-    const x1 = item.side === 'l' ? 232 : 968;
+    const x1 = item.side === 'l' ? 244 : 956;
     const ring = item.ring ? `<circle class="hl-ring" cx="${f(t.x)}" cy="${f(t.y)}" r="30"/>` : '';
-    return `<g class="aud aud-${item.aud}"><path class="lead-line" d="M${x1} ${item.y} L${f(t.x)} ${f(t.y)}"/><circle class="lead-dot" cx="${f(t.x)}" cy="${f(t.y)}" r="4"/>${ring}</g>`;
+    return `<g class="aud aud-${item.aud} lead" data-book="${item.dir}"><path class="lead-line" d="M${x1} ${item.y} L${f(t.x)} ${f(t.y)}"/><circle class="lead-dot" cx="${f(t.x)}" cy="${f(t.y)}" r="4"/>${ring}<circle class="hit" cx="${f(t.x)}" cy="${f(t.y)}" r="34"/></g>`;
   })
   .join('');
 
-// На телефоне выноски не помещаются: зубы получают номера, а карточки под схемой те же номера
-const numbered = treatments.map((item) => ({
-  ...item,
-  num: treatments.filter((other) => other.aud === item.aud).indexOf(item) + 1,
-}));
+// На телефоне выноски не помещаются: зубы получают номера, а карточки под схемой те же номера.
+// Аудитория точки на схеме важнее списка аудиторий направления, поэтому item идёт вторым
+const numbered = treatments.map((item) => {
+  const dir = direction(item.dir);
+  // Последнее слово описания держится вместе со стрелкой, чтобы стрелка не переносилась одна
+  const words = dir.note.split(' ');
+  return {
+    ...dir,
+    ...item,
+    noteTail: words.pop() ?? '',
+    noteHead: words.join(' '),
+    num: treatments.filter((other) => other.aud === item.aud).indexOf(item) + 1,
+  };
+});
 const mobileMarkers = numbered
   .map((item) => {
     const t = teeth[item.tooth[0]][item.tooth[1]];
-    return `<g class="aud aud-${item.aud} marker"><circle cx="${f(t.x)}" cy="${f(t.y)}" r="17"/><text x="${f(t.x)}" y="${f(t.y + 6)}" text-anchor="middle">${item.num}</text></g>`;
+    return `<g class="aud aud-${item.aud} marker" data-book="${item.dir}"><circle cx="${f(t.x)}" cy="${f(t.y)}" r="17"/><text x="${f(t.x)}" y="${f(t.y + 6)}" text-anchor="middle">${item.num}</text><circle class="hit" cx="${f(t.x)}" cy="${f(t.y)}" r="30"/></g>`;
   })
   .join('');
 ---
@@ -84,10 +96,17 @@ const mobileMarkers = numbered
 
   <div class="scheme">
     <svg viewBox="0 0 1200 640" role="img" aria-label="Схема зубного ряда: постоянные и молочные зубы" set:html={archSvg + leaders} />
-    {treatments.map((item) => (
-      <p class={`t-chip aud aud-${item.aud} side-${item.side}`} style={`top:${((item.y / 640) * 100).toFixed(2)}%`}>
-        <b>{item.title}</b>{item.note}
-      </p>
+    {numbered.map((item) => (
+      <a
+        class={`t-chip aud aud-${item.aud} side-${item.side}`}
+        style={`top:${((item.y / 640) * 100).toFixed(2)}%`}
+        href="#booking"
+        data-book={item.dir}
+        aria-label={`${item.label}, ${item.note}: записаться`}
+      >
+        <b>{item.label}</b>
+        <span class="t-go">{item.noteHead} <span class="t-tail">{item.noteTail}<Icon name="arrow" size={16} /></span></span>
+      </a>
     ))}
   </div>
 
@@ -96,8 +115,14 @@ const mobileMarkers = numbered
     <ol class="t-list">
       {numbered.map((item) => (
         <li class={`aud aud-${item.aud}`}>
-          <span class="num" aria-hidden="true">{item.num}</span>
-          <span><b>{item.title}</b>{item.note}</span>
+          <a href="#booking" data-book={item.dir} aria-label={`${item.label}, ${item.note}: записаться`}>
+            <span class="t-top">
+              <span class="num" aria-hidden="true">{item.num}</span>
+              <Icon name="arrow" size={16} />
+            </span>
+            <b>{item.label}</b>
+            <span>{item.note}</span>
+          </a>
         </li>
       ))}
     </ol>
@@ -138,7 +163,8 @@ const mobileMarkers = numbered
     aspect-ratio: 1200 / 640;
     margin: 8px auto 0;
   }
-  .treat .scheme svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  /* Только сама схема, не иконки внутри плашек */
+  .treat .scheme > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 
   .treat .perm rect { fill: #FFFFFF; stroke: var(--color-ink); stroke-width: 2; transition: fill calc(.35s * var(--dur)) var(--ease-ui); }
   .treat .perm { transition: opacity calc(.35s * var(--dur)) var(--ease-ui); }
@@ -153,11 +179,18 @@ const mobileMarkers = numbered
   .treat[data-aud='child'] .perm rect.hl { fill: #FFFFFF; }
   .treat[data-aud='child'] .milk rect { fill: #FFFFFF; stroke: var(--color-ink); stroke-width: 1.8; }
 
-  .treat .lead-line { fill: none; stroke: var(--color-ink-2); stroke-opacity: .45; stroke-width: 1.5; }
+  /* Схема кликабельна: зуб под курсором ловит холодный свет, как выбранное в записи */
+  .treat svg [data-book] { cursor: pointer; }
+  .treat[data-aud='adult'] .perm rect:hover,
+  .treat[data-aud='child'] .milk rect:hover { fill: var(--color-light-b); }
+  .treat .hit { fill: transparent; }
+
+  .treat .lead-line { fill: none; stroke: var(--color-ink-2); stroke-opacity: .45; stroke-width: 1.5; transition: stroke-opacity calc(.2s * var(--dur)) var(--ease-ui); }
+  .treat .lead:hover .lead-line { stroke-opacity: .9; }
   .treat .lead-dot { fill: var(--color-ink); }
   .treat .hl-ring { fill: none; stroke: var(--color-light); stroke-width: 2.5; }
 
-  .treat .marker circle { fill: var(--color-ink); stroke: var(--color-light-b); stroke-width: 3; }
+  .treat .marker circle:not(.hit) { fill: var(--color-ink); stroke: var(--color-light-b); stroke-width: 3; }
   .treat .marker text { fill: var(--color-mist); font-family: var(--font-display); font-weight: var(--display-weight); font-size: 18px; }
 
   .treat .aud { transition: opacity calc(.35s * var(--dur)) var(--ease-ui), visibility calc(.35s * var(--dur)); }
@@ -166,7 +199,8 @@ const mobileMarkers = numbered
 
   .treat .t-chip {
     position: absolute;
-    width: 18.5%;
+    display: block;
+    width: 19.5%;
     margin: 0;
     padding: 14px 18px;
     border-radius: calc(16px * var(--round-k));
@@ -175,7 +209,19 @@ const mobileMarkers = numbered
     font-size: 14px;
     line-height: 1.35;
     color: var(--color-ink-2);
+    text-decoration: none;
     transform: translateY(-50%);
+    transition:
+      opacity calc(.35s * var(--dur)) var(--ease-ui),
+      visibility calc(.35s * var(--dur)),
+      background-color calc(.2s * var(--dur)) var(--ease-ui),
+      box-shadow calc(.2s * var(--dur)) var(--ease-ui);
+  }
+  .treat .t-chip:hover {
+    background: rgba(255, 255, 255, .94);
+    box-shadow:
+      0 0 0 2px var(--color-light-b),
+      0 12px 28px rgb(27 44 52 / calc(.14 * var(--shadow-k)));
   }
   .treat .t-chip b, .treat .t-list b {
     display: block;
@@ -185,9 +231,22 @@ const mobileMarkers = numbered
     font-size: calc(var(--card-title) * 1px);
     color: var(--color-ink);
   }
-  /* На телефоне карточки узкие: заголовок меньше, текст может сжиматься и переноситься */
-  .treat .t-list b { font-size: min(15px, calc(var(--card-title) * 15px / 18)); }
-  .treat .t-list li > span:last-child { min-width: 0; overflow-wrap: break-word; hyphens: auto; }
+  /* На узком десктопе плашки сужаются вместе со схемой, поэтому заголовок уменьшается до 16px */
+  .treat .t-chip b {
+    font-size: clamp(16px, calc(var(--card-title) * 1.5vw / 21), calc(var(--card-title) * 1px));
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  .treat .t-go { display: block; }
+  .treat .t-tail { white-space: nowrap; }
+  .treat .t-go svg {
+    display: inline-block;
+    margin-left: 6px;
+    vertical-align: -3px;
+    color: var(--color-ink-2);
+    transition: transform calc(.2s * var(--dur)) var(--ease-ui), color calc(.2s * var(--dur)) var(--ease-ui);
+  }
+  .treat .t-chip:hover .t-go svg { color: var(--color-ink); transform: translateX(3px); }
   .treat .side-l { left: 0; }
   .treat .side-r { right: 0; }
 
@@ -196,7 +255,7 @@ const mobileMarkers = numbered
   @media (max-width: 900px) {
     .treat .scheme { display: none; }
     .treat .scheme-mobile { display: block; padding: 20px var(--pad-x) 0; }
-    .treat .scheme-mobile svg { display: block; width: min(320px, 78%); height: auto; margin: 0 auto; overflow: visible; }
+    .treat .scheme-mobile > svg { display: block; width: min(320px, 78%); height: auto; margin: 0 auto; overflow: visible; }
     .treat .t-list {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -205,24 +264,30 @@ const mobileMarkers = numbered
       padding: 0;
       list-style: none;
     }
-    .treat .t-list li {
+    /* Номер и стрелка в верхней строке, чтобы заголовок занимал всю ширину карточки */
+    .treat .t-list a {
       display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 14px 14px;
+      flex-direction: column;
+      height: 100%;
+      padding: 14px;
       border-radius: calc(16px * var(--round-k));
       background: rgba(255, 255, 255, .78);
       font-size: 14px;
       line-height: 1.35;
       color: var(--color-ink-2);
+      text-decoration: none;
+      transition: background-color calc(.2s * var(--dur)) var(--ease-ui), box-shadow calc(.2s * var(--dur)) var(--ease-ui);
     }
+    .treat .t-list a:active { background: #FFFFFF; box-shadow: 0 0 0 2px var(--color-light-b); }
+    .treat .t-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .treat .t-top svg { color: var(--color-ink-2); }
+    .treat .t-list b { font-size: min(16px, calc(var(--card-title) * 16px / 18)); overflow-wrap: break-word; hyphens: auto; }
     .treat .t-list .num {
       flex: none;
       display: grid;
       place-items: center;
       width: 24px;
       height: 24px;
-      margin-top: 1px;
       border-radius: 50%;
       background: var(--color-ink);
       box-shadow: 0 0 0 2px var(--color-light-b);

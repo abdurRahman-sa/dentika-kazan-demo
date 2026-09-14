@@ -1,0 +1,100 @@
+---
+import { clinic } from '../data/clinic';
+import Icon from './Icon.astro';
+---
+
+<div class="action-bar" data-action-bar inert>
+  <a class="btn btn-dark book" href="#booking">Записаться на приём</a>
+  <a class="call" href={clinic.phoneHref} aria-label={`Позвонить в клинику: ${clinic.phoneDisplay}`}>
+    <Icon name="phone" size={22} />
+  </a>
+</div>
+
+<style>
+  .action-bar { display: none; }
+
+  /* Только на телефоне и планшете: телефона в шапке там нет, а кнопка записи сверху далеко от большого пальца */
+  @media (max-width: 960px) {
+    .action-bar {
+      position: fixed;
+      left: max(12px, env(safe-area-inset-left));
+      right: max(12px, env(safe-area-inset-right));
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      z-index: 40;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      max-width: 520px;
+      margin-inline: auto;
+      padding: 8px;
+      border-radius: calc(var(--btn-radius) * 1px + 8px);
+      background: rgba(247, 250, 251, .96);
+      box-shadow:
+        0 12px 30px rgb(27 44 52 / calc(.5 * var(--shadow-k))),
+        0 2px 8px rgb(27 44 52 / calc(.25 * var(--shadow-k)));
+      transform: translateY(calc(100% + 32px));
+      visibility: hidden;
+      transition:
+        transform calc(.5s * var(--dur)) cubic-bezier(.16, 1, .3, 1),
+        visibility 0s linear calc(.5s * var(--dur));
+    }
+    .action-bar[data-show] {
+      transform: none;
+      visibility: visible;
+      transition:
+        transform calc(.5s * var(--dur)) cubic-bezier(.16, 1, .3, 1),
+        visibility 0s;
+    }
+    .book { height: 52px; min-width: 0; padding: 0 16px; }
+    .call {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      border-radius: calc(var(--btn-radius) * 1px);
+      background: #FFFFFF;
+      box-shadow: inset 0 0 0 1px var(--color-line);
+      color: var(--color-ink);
+      transition: background-color calc(.2s * var(--dur)) var(--ease-ui);
+    }
+    .call:active { background: var(--color-flat); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .action-bar,
+    .action-bar[data-show] { transition: none; }
+  }
+</style>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-action-bar]');
+  const hero = document.querySelector('[data-hero]');
+
+  if (bar && hero) {
+    let afterHero = false;
+    const inZone = new Set<Element>();
+    const sync = () => {
+      const show = afterHero && inZone.size === 0;
+      bar.toggleAttribute('data-show', show);
+      bar.inert = !show;
+    };
+
+    // Появляется, когда первый экран поднялся выше середины окна
+    new IntersectionObserver(
+      ([entry]) => {
+        afterHero = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+        sync();
+      },
+      { rootMargin: '-50% 0px 0px 0px' },
+    ).observe(hero);
+
+    // Прячется у формы записи и у предупреждения в подвале, чтобы ничего не закрывать
+    const zones = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => (entry.isIntersecting ? inZone.add(entry.target) : inZone.delete(entry.target)));
+        sync();
+      },
+      { rootMargin: '0px 0px -15% 0px' },
+    );
+    document.querySelectorAll('#booking, footer').forEach((zone) => zones.observe(zone));
+  }
+</script>

@@ -1,7 +1,10 @@
 ---
 import { Image } from 'astro:assets';
-import { clinic } from '../data/clinic';
+import { audienceText, clinic, direction } from '../data/clinic';
 import tooth from '../assets/hero-tooth.png';
+
+// Плашки по бокам постамента: одно направление только для взрослых, одно для всех
+const chips = { l: direction('implant'), r: direction('orthodontics') };
 ---
 
 <section id="top" class="hero" data-hero>
@@ -28,14 +31,14 @@ import tooth from '../assets/hero-tooth.png';
         <div class="object">
           <Image src={tooth} alt="" widths={[210, 420, 630]} sizes="210px" loading="eager" fetchpriority="high" />
         </div>
-        <p class="chip chip-l"><b>Хирургия и имплантация</b>для взрослых</p>
-        <p class="chip chip-r"><b>Ортодонтия</b>для детей и взрослых</p>
+        <a class="chip chip-l" href="#booking" data-book={chips.l.id}><b>{chips.l.label}</b>{audienceText(chips.l.aud)}</a>
+        <a class="chip chip-r" href="#booking" data-book={chips.r.id}><b>{chips.r.label}</b>{audienceText(chips.r.aud)}</a>
       </div>
     </div>
 
     <div class="chips-m">
-      <p class="chip chip-m chip-m-l"><b>Хирургия и имплантация</b>для взрослых</p>
-      <p class="chip chip-m chip-m-r"><b>Ортодонтия</b>для детей и взрослых</p>
+      <a class="chip chip-m chip-m-l" href="#booking" data-book={chips.l.id}><b>{chips.l.label}</b>{audienceText(chips.l.aud)}</a>
+      <a class="chip chip-m chip-m-r" href="#booking" data-book={chips.r.id}><b>{chips.r.label}</b>{audienceText(chips.r.aud)}</a>
     </div>
 
     <ul class="rates rates-corner">
@@ -213,6 +216,22 @@ import tooth from '../assets/hero-tooth.png';
     font-size: calc(var(--chip-title) * 1px);
     color: var(--color-ink);
   }
+  /* Плашка ведёт к записи с выбранным направлением */
+  a.chip {
+    text-decoration: none;
+    transition:
+      background-color calc(.2s * var(--dur)) var(--ease-ui),
+      box-shadow calc(.2s * var(--dur)) var(--ease-ui);
+  }
+  a.chip:hover {
+    background: rgba(255, 255, 255, .94);
+    box-shadow:
+      0 0 0 2px var(--color-light-b),
+      0 12px 28px rgb(27 44 52 / calc(.14 * var(--shadow-k)));
+  }
+  /* Растворившиеся при прокрутке плашки не должны ловить нажатия */
+  .hero[data-chips-gone] .stage .chip,
+  .hero[data-chips-m-gone] .chip-m { pointer-events: none; }
   .chip-l { left: -140px; top: 130px; transform: translate(calc(var(--ps) * -80px), calc(var(--ps) * -30px)); }
   .chip-r { left: 600px; top: 90px; transform: translate(calc(var(--ps) * 80px), calc(var(--ps) * -30px)); }
   .chips-m { display: none; }
@@ -312,6 +331,9 @@ import tooth from '../assets/hero-tooth.png';
       hero.style.setProperty('--pt', pt.toFixed(4));
       hero.style.setProperty('--ps', ps.toFixed(4));
       hero.style.setProperty('--pl', pl.toFixed(4));
+      // Пороги совпадают с CSS-прозрачностью плашек: на десктопе они гаснут к 0.87, на телефоне к 0.42
+      hero.toggleAttribute('data-chips-gone', ps > 0.8);
+      hero.toggleAttribute('data-chips-m-gone', ps > 0.35);
     };
     const update = () => {
       queued = false;

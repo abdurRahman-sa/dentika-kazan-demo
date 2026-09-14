@@ -88,7 +88,7 @@ const CONTROLS: Control[] = [
       { value: 'off', label: 'Без анимации' },
     ],
   },
-  { group: G.hero, id: 'pin', label: 'Длина закрепления, % высоты экрана', type: 'range', min: 0, max: 200, step: 5, unit: '%' },
+  { group: G.hero, id: 'pin', label: 'Длина закрепления, % высоты экрана', type: 'range', min: 0, max: 200, step: 2.5, unit: '%' },
   { group: G.hero, id: 'rise-k', label: 'Подъём постамента', type: 'range', min: 0, max: 2.5, step: 0.05, unit: '×' },
   { group: G.hero, id: 'zoom-k', label: 'Приближение постамента', type: 'range', min: 0, max: 3, step: 0.05, unit: '×' },
   { group: G.hero, id: 'chip-title', label: 'Плашки: заголовок', type: 'range', min: 12, max: 28, step: 1, unit: 'px' },
