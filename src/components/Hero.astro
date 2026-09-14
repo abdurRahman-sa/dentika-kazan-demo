@@ -300,6 +300,9 @@ const chips = { l: direction('implant'), r: direction('orthodontics') };
     .copy { top: 92px; }
     .lead { margin-top: 14px; }
     .acts { margin-top: 22px; }
+    /* Размеры плашек из панели твиков подобраны на десктопе; на телефоне крупнее 14 и 12 px плашки закрывают коронку зуба */
+    .chip-m { font-size: min(calc(var(--chip-note) * 12px / 16), 12px); }
+    .chip-m b { font-size: min(calc(var(--chip-title) * 14px / 20), 14px); }
   }
   @media (max-width: 720px) and (max-height: 740px) {
     .hero { --s: .36; --lift: 0px; }

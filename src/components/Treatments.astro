@@ -1,6 +1,5 @@
 ---
 import { direction, treatments } from '../data/clinic';
-import Icon from './Icon.astro';
 
 // Зубной ряд строится при сборке: постоянные зубы по внешнему эллипсу, молочные по внутреннему.
 type Tooth = { x: number; y: number; w: number; h: number; rot: number };
@@ -65,18 +64,11 @@ const leaders = treatments
 
 // На телефоне выноски не помещаются: зубы получают номера, а карточки под схемой те же номера.
 // Аудитория точки на схеме важнее списка аудиторий направления, поэтому item идёт вторым
-const numbered = treatments.map((item) => {
-  const dir = direction(item.dir);
-  // Последнее слово описания держится вместе со стрелкой, чтобы стрелка не переносилась одна
-  const words = dir.note.split(' ');
-  return {
-    ...dir,
-    ...item,
-    noteTail: words.pop() ?? '',
-    noteHead: words.join(' '),
-    num: treatments.filter((other) => other.aud === item.aud).indexOf(item) + 1,
-  };
-});
+const numbered = treatments.map((item) => ({
+  ...direction(item.dir),
+  ...item,
+  num: treatments.filter((other) => other.aud === item.aud).indexOf(item) + 1,
+}));
 const mobileMarkers = numbered
   .map((item) => {
     const t = teeth[item.tooth[0]][item.tooth[1]];
@@ -104,8 +96,7 @@ const mobileMarkers = numbered
         data-book={item.dir}
         aria-label={`${item.label}, ${item.note}: записаться`}
       >
-        <b>{item.label}</b>
-        <span class="t-go">{item.noteHead} <span class="t-tail">{item.noteTail}<Icon name="arrow" size={16} /></span></span>
+        <b>{item.label}</b>{item.note}
       </a>
     ))}
   </div>
@@ -116,10 +107,7 @@ const mobileMarkers = numbered
       {numbered.map((item) => (
         <li class={`aud aud-${item.aud}`}>
           <a href="#booking" data-book={item.dir} aria-label={`${item.label}, ${item.note}: записаться`}>
-            <span class="t-top">
-              <span class="num" aria-hidden="true">{item.num}</span>
-              <Icon name="arrow" size={16} />
-            </span>
+            <span class="num" aria-hidden="true">{item.num}</span>
             <b>{item.label}</b>
             <span>{item.note}</span>
           </a>
@@ -237,16 +225,6 @@ const mobileMarkers = numbered
     overflow-wrap: break-word;
     hyphens: auto;
   }
-  .treat .t-go { display: block; }
-  .treat .t-tail { white-space: nowrap; }
-  .treat .t-go svg {
-    display: inline-block;
-    margin-left: 6px;
-    vertical-align: -3px;
-    color: var(--color-ink-2);
-    transition: transform calc(.2s * var(--dur)) var(--ease-ui), color calc(.2s * var(--dur)) var(--ease-ui);
-  }
-  .treat .t-chip:hover .t-go svg { color: var(--color-ink); transform: translateX(3px); }
   .treat .side-l { left: 0; }
   .treat .side-r { right: 0; }
 
@@ -264,7 +242,7 @@ const mobileMarkers = numbered
       padding: 0;
       list-style: none;
     }
-    /* Номер и стрелка в верхней строке, чтобы заголовок занимал всю ширину карточки */
+    /* Номер над заголовком, чтобы заголовок занимал всю ширину карточки */
     .treat .t-list a {
       display: flex;
       flex-direction: column;
@@ -279,8 +257,6 @@ const mobileMarkers = numbered
       transition: background-color calc(.2s * var(--dur)) var(--ease-ui), box-shadow calc(.2s * var(--dur)) var(--ease-ui);
     }
     .treat .t-list a:active { background: #FFFFFF; box-shadow: 0 0 0 2px var(--color-light-b); }
-    .treat .t-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .treat .t-top svg { color: var(--color-ink-2); }
     .treat .t-list b { font-size: min(16px, calc(var(--card-title) * 16px / 18)); overflow-wrap: break-word; hyphens: auto; }
     .treat .t-list .num {
       flex: none;
@@ -288,6 +264,7 @@ const mobileMarkers = numbered
       place-items: center;
       width: 24px;
       height: 24px;
+      margin-bottom: 10px;
       border-radius: 50%;
       background: var(--color-ink);
       box-shadow: 0 0 0 2px var(--color-light-b);
