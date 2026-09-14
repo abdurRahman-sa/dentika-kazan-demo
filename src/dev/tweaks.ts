@@ -32,6 +32,7 @@ const G = {
   grid: 'Сетка и ритм',
   shape: 'Форма',
   hero: 'Первый экран',
+  treat: 'Что лечим',
   motion: 'Анимации интерфейса',
 };
 
@@ -93,6 +94,9 @@ const CONTROLS: Control[] = [
   { group: G.hero, id: 'zoom-k', label: 'Приближение постамента', type: 'range', min: 0, max: 3, step: 0.05, unit: '×' },
   { group: G.hero, id: 'chip-title', label: 'Плашки: заголовок', type: 'range', min: 12, max: 28, step: 1, unit: 'px' },
   { group: G.hero, id: 'chip-note', label: 'Плашки: подпись', type: 'range', min: 10, max: 22, step: 1, unit: 'px' },
+
+  { group: G.treat, id: 'treat-title-y', label: '«Что лечим» с переключателем: сдвиг по вертикали', type: 'range', min: -40, max: 120, step: 2, unit: 'px' },
+  { group: G.treat, id: 'treat-toggle-y', label: 'Взрослым / Детям: сдвиг от заголовка', type: 'range', min: -20, max: 120, step: 2, unit: 'px' },
 
   { group: G.motion, id: 'dur', label: 'Длительность переходов', type: 'range', min: 0, max: 4, step: 0.05, unit: '×' },
   {
