@@ -31,5 +31,7 @@ const {
   </head>
   <body>
     <slot />
+    {/* Панель твиков только в `astro dev`: скрипт отдаёт dev-сервер Vite, в сборку он не попадает */}
+    {import.meta.env.DEV && <script is:inline type="module" src="/src/dev/tweaks.ts"></script>}
   </body>
 </html>

@@ -27,14 +27,16 @@ const links = [
     position: fixed;
     inset: 0 0 auto 0;
     z-index: 50;
-    transition: background-color .3s ease, box-shadow .3s ease;
+    transition:
+      background-color calc(.3s * var(--dur)) var(--ease-ui),
+      box-shadow calc(.3s * var(--dur)) var(--ease-ui);
   }
   .site-header[data-scrolled] {
     background: rgba(247, 250, 251, .95);
     box-shadow: 0 1px 0 var(--color-rule);
   }
   .bar {
-    max-width: 1440px;
+    max-width: calc(var(--content) * 1px);
     margin: 0 auto;
     height: 96px;
     display: flex;
@@ -46,7 +48,7 @@ const links = [
   .logo {
     margin-right: auto;
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: var(--display-weight);
     font-size: 26px;
     letter-spacing: -0.02em;
     color: var(--color-ink);
@@ -65,7 +67,7 @@ const links = [
     align-items: center;
     height: 44px;
     padding: 0 18px;
-    border-radius: 12px;
+    border-radius: calc(var(--btn-radius) * .75px);
     background: var(--color-ink);
     color: var(--color-mist);
     font-family: var(--font-display);

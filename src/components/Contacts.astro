@@ -5,7 +5,14 @@ import Icon from './Icon.astro';
 
 <section id="contacts" class="contacts">
   <div class="wrap grid">
-    <div class="ph map"><span class="ph-label"><Icon name="pin" />Место под карту</span></div>
+    <div class="map" data-map data-src={clinic.mapWidget}>
+      <div class="facade" data-map-facade>
+        <span class="pin"><Icon name="pin" size={26} /></span>
+        <p class="facade-addr">{clinic.address}</p>
+        <button type="button" class="btn btn-dark facade-btn" data-map-load>Показать карту</button>
+        <p class="facade-note">Карта загрузится с сервиса Яндекс Карты</p>
+      </div>
+    </div>
     <div class="info">
       <h2 class="h2">Контакты</h2>
       <address>
@@ -29,9 +36,68 @@ import Icon from './Icon.astro';
     align-items: start;
   }
   .map {
-    height: clamp(260px, 26.4vw, 380px);
-    background: repeating-linear-gradient(45deg, #D8E3E7 0 10px, #E5EDF0 10px 20px);
+    position: relative;
+    height: clamp(300px, 26.4vw, 380px);
+    border-radius: var(--radius-slot);
+    overflow: hidden;
+    background: radial-gradient(90% 90% at 50% 40%, var(--field-top) 0%, var(--field-mid) 55%, #D3DFE4 100%);
   }
+  .map :global(iframe) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    filter: saturate(.75);
+  }
+
+  /* Заставка вместо карты: метка в световом кольце, как у постамента на первом экране */
+  .facade {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px;
+    text-align: center;
+  }
+  .pin {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 8px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    color: var(--color-ink);
+    box-shadow: 0 10px 24px rgb(27 44 52 / calc(.12 * var(--shadow-k)));
+  }
+  .pin::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -14px;
+    width: 96px;
+    height: 22px;
+    border: 2px solid var(--color-light-b);
+    border-radius: 50%;
+    box-shadow: 0 4px calc(14px * var(--glow)) rgb(from var(--color-light) r g b / calc(.6 * min(1, var(--glow))));
+    transform: translateX(-50%);
+  }
+  .facade-addr {
+    max-width: 320px;
+    margin-top: 12px;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 1.35;
+    color: var(--color-ink);
+  }
+  .facade-btn { margin-top: 10px; }
+  .facade-note { font-size: 13px; color: var(--color-ink-2); }
+
   .info { padding-top: 16px; }
   address {
     display: flex;
@@ -45,7 +111,7 @@ import Icon from './Icon.astro';
     display: inline-block;
     margin-top: 28px;
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: var(--display-weight);
     font-size: clamp(28px, 2.4vw, 34px);
     letter-spacing: -0.02em;
     color: var(--color-ink);
@@ -59,3 +125,20 @@ import Icon from './Icon.astro';
     .info { padding-top: 0; }
   }
 </style>
+
+<script>
+  // Карта Яндекса подключается только после нажатия: до этого на странице нет стороннего кода и cookie
+  const map = document.querySelector<HTMLElement>('[data-map]');
+  const button = map?.querySelector<HTMLButtonElement>('[data-map-load]');
+
+  button?.addEventListener('click', () => {
+    if (!map?.dataset.src) return;
+    const frame = document.createElement('iframe');
+    frame.src = map.dataset.src;
+    frame.title = 'Dentika на Яндекс Картах';
+    frame.allowFullscreen = true;
+    frame.referrerPolicy = 'no-referrer-when-downgrade';
+    map.querySelector('[data-map-facade]')?.remove();
+    map.append(frame);
+  });
+</script>

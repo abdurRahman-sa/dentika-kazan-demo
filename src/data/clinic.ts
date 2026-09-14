@@ -6,6 +6,8 @@ export const clinic = {
   phoneDisplay: '+7 (910) 286-67-67',
   phoneHref: 'tel:+79102866767',
   mapHref: 'https://yandex.ru/maps/org/dentika/146051744492/',
+  // Встраиваемая карта Яндекса с карточкой клиники; грузится только по нажатию
+  mapWidget: 'https://yandex.ru/map-widget/v1/org/dentika/146051744492/',
   ratings: [
     {
       source: '2ГИС',

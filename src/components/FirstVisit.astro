@@ -44,9 +44,9 @@ const steps = [
   }
   li {
     position: relative;
-    height: calc(120px + var(--i) * 60px);
+    height: calc(var(--step-base) * 1px + var(--i) * var(--step-inc) * 1px);
     padding: 24px;
-    border-radius: 18px 18px 0 0;
+    border-radius: calc(18px * var(--round-k)) calc(18px * var(--round-k)) 0 0;
     background: linear-gradient(180deg, #FFFFFF, #D3DFE4);
   }
   li::before {
@@ -58,9 +58,9 @@ const steps = [
     height: 3px;
     border-radius: 2px;
     background: #FFFFFF;
-    box-shadow: 0 2px 12px rgba(127, 211, 240, .7);
+    box-shadow: 0 2px calc(12px * var(--glow)) rgb(from var(--color-light) r g b / calc(.7 * min(1, var(--glow))));
   }
-  h3 { font-size: 22px; line-height: 1.2; letter-spacing: -0.01em; }
+  h3 { font-size: calc(var(--card-title) * 22px / 18); line-height: 1.2; letter-spacing: -0.01em; }
   li p { margin-top: 4px; font-size: 15px; line-height: 1.4; color: var(--color-ink-2); }
 
   @media (max-width: 900px) {
@@ -68,9 +68,13 @@ const steps = [
   }
   @media (max-width: 720px) {
     .steps { gap: 6px; }
-    li { height: calc(150px + var(--i) * 50px); padding: 16px 12px; border-radius: 14px 14px 0 0; }
+    li {
+      height: calc(var(--step-base) * 150px / 120 + var(--i) * var(--step-inc) * 50px / 60);
+      padding: 16px 12px;
+      border-radius: calc(14px * var(--round-k)) calc(14px * var(--round-k)) 0 0;
+    }
     li::before { left: 10px; right: 10px; }
-    h3 { font-size: 17px; }
+    h3 { font-size: calc(var(--card-title) * 17px / 18); }
     li p { font-size: 13px; }
   }
 </style>
